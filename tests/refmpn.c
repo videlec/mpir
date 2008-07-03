@@ -22,6 +22,13 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
 
+
+/*
+  refmpn_divexact_byff() is Copyright 2008 David Harvey
+ */
+
+
+
 /* Most routines have assertions representing what the mpn routines are
    supposed to accept.  Many of these reference routines do sensible things
    outside these ranges (eg. for size==0), but the assertions are present to
@@ -1300,6 +1307,44 @@ mp_limb_t
 refmpn_divexact_by3 (mp_ptr rp, mp_srcptr sp, mp_size_t size)
 {
   return refmpn_divexact_by3c (rp, sp, size, CNST_LIMB(0));
+}
+
+
+/*
+  Strategy is to append a suitable high limb making input exactly
+  divisible by B-1 (it's just the negative of the sum of the digits),
+  and then divide by B-1, finally discarding the high limb.
+ */
+void
+refmpn_divexact_byff (mp_ptr rp, mp_srcptr sp, mp_size_t size)
+{
+  mp_ptr spcopy;
+  mp_size_t i;
+  mp_limb_t hi, cy, rem;
+
+  ASSERT (refmpn_overlap_fullonly_p (rp, sp, size));
+  ASSERT (size >= 1);
+  ASSERT_MPN (sp, size);
+
+  spcopy = refmpn_malloc_limbs(size + 1);
+
+  hi = 0;
+  for (i = 0; i < size; i++)
+  {
+     cy = refmpn_add_1(&hi, &hi, 1, sp[i]);
+     cy = refmpn_add_1(&hi, &hi, 1, cy);
+     ASSERT(cy == 0);
+     spcopy[i] = sp[i];
+  }
+  spcopy[size] = GMP_NUMB_MAX - hi;   /* makes it divisible by B-1 */
+
+  rem = refmpn_divrem_1(spcopy, 0, spcopy, size + 1, GMP_NUMB_MAX);
+  ASSERT(rem == 0);
+
+  for (i = 0; i < size; i++)
+     rp[i] = spcopy[i];
+
+  free(spcopy);
 }
 
 

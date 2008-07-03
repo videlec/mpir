@@ -610,6 +610,7 @@ validate_sqrtrem (void)
 #define TYPE_DIVEXACT_BY3C    52
 #define TYPE_MODEXACT_1_ODD   53
 #define TYPE_MODEXACT_1C_ODD  54
+#define TYPE_DIVEXACT_BYFF    55
 
 #define TYPE_GCD              60
 #define TYPE_GCD_1            61
@@ -966,6 +967,12 @@ param_init (void)
   p->src[0] = 1;
   REFERENCE (refmpn_divexact_by3);
 
+  p = &param[TYPE_DIVEXACT_BYFF];
+  p->retval = 0;
+  p->dst[0] = 1;
+  p->src[0] = 1;
+  REFERENCE (refmpn_divexact_byff);
+
   p = &param[TYPE_DIVEXACT_BY3C];
   COPY (TYPE_DIVEXACT_BY3);
   p->carry = CARRY_3;
@@ -1233,6 +1240,12 @@ mpn_divexact_by3_fun (mp_ptr rp, mp_srcptr sp, mp_size_t size)
   return mpn_divexact_by3 (rp, sp, size);
 }
 
+void
+mpn_divexact_byff_fun (mp_ptr rp, mp_srcptr sp, mp_size_t size)
+{
+  mpn_divexact_byff (rp, sp, size);
+}
+
 mp_limb_t
 mpn_modexact_1_odd_fun (mp_srcptr ptr, mp_size_t size, mp_limb_t divisor)
 {
@@ -1426,6 +1439,7 @@ const struct choice_t choice_array[] = {
   { TRY(mpn_divexact_1),          TYPE_DIVEXACT_1 },
   { TRY_FUNFUN(mpn_divexact_by3), TYPE_DIVEXACT_BY3 },
   { TRY(mpn_divexact_by3c),       TYPE_DIVEXACT_BY3C },
+  { TRY(mpn_divexact_byff),       TYPE_DIVEXACT_BYFF },
 
   { TRY_FUNFUN(mpn_modexact_1_odd), TYPE_MODEXACT_1_ODD },
   { TRY(mpn_modexact_1c_odd),       TYPE_MODEXACT_1C_ODD },
@@ -2008,6 +2022,7 @@ call (struct each_t *e, tryfun_t function)
 
 
   case TYPE_DIVEXACT_BY3:
+  case TYPE_DIVEXACT_BYFF:
     e->retval = CALLING_CONVENTIONS (function) (e->d[0].p, e->s[0].p, size);
     break;
   case TYPE_DIVEXACT_BY3C:
