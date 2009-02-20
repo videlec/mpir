@@ -873,10 +873,17 @@ speed_mpn_xor_n (struct speed_params *s)
 {
   SPEED_ROUTINE_MPN_BINARY_N_CALL (mpn_xor_n (wp, s->xp, s->yp, s->size));
 }
+
+
 double
 speed_mpn_xnor_n (struct speed_params *s)
 {
   SPEED_ROUTINE_MPN_BINARY_N_CALL (mpn_xnor_n (wp, s->xp, s->yp, s->size));
+}
+double
+speed_mpn_jaytest (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_BINARY_N_CALL (mpn_jaytest (wp, s->xp, s->yp, s->size));
 }
 
 

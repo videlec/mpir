@@ -167,6 +167,9 @@ const struct routine_t {
 
   { "mpn_addmul_1",      speed_mpn_addmul_1,  FLAG_R },
   { "mpn_submul_1",      speed_mpn_submul_1,  FLAG_R },
+#if HAVE_NATIVE_mpn_jaytest
+  { "mpn_jaytest",      speed_mpn_jaytest,  FLAG_R_OPTIONAL },
+#endif
 #if HAVE_NATIVE_mpn_addmul_2
   { "mpn_addmul_2",      speed_mpn_addmul_2,  FLAG_R_OPTIONAL },
 #endif

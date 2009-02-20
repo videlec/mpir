@@ -147,6 +147,7 @@ double speed_modlimb_invert_arith _PROTO ((struct speed_params *s));
 double speed_mpf_init_clear _PROTO ((struct speed_params *s));
 
 double speed_mpn_add_n _PROTO ((struct speed_params *s));
+double speed_mpn_jaytest _PROTO ((struct speed_params *s));
 double speed_mpn_addadd_n _PROTO ((struct speed_params *s));
 double speed_mpn_addlsh1_n _PROTO ((struct speed_params *s));
 double speed_mpn_sumdiff_n _PROTO ((struct speed_params *s));

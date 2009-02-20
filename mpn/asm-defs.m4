@@ -1300,6 +1300,7 @@ define(define_mpn,
 m4_assert_numargs(1)
 `define(`mpn_$1',`MPN(`$1')')')
 
+define_mpn(jaytest)
 define_mpn(add)
 define_mpn(add_1)
 define_mpn(add_n)

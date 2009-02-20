@@ -2919,6 +2919,7 @@ dnl  possible mpn routine.
 AH_VERBATIM([HAVE_NATIVE],
 [/* Define to 1 each of the following for which a native (ie. CPU specific)
     implementation of the corresponding routine exists.  */
+#undef HAVE_NATIVE_mpn_jaytest
 #undef HAVE_NATIVE_mpn_add_n
 #undef HAVE_NATIVE_mpn_add_nc
 #undef HAVE_NATIVE_mpn_addadd_n
