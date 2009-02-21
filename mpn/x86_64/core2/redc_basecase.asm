@@ -229,7 +229,7 @@ imul %rcx,%r13
 add %r12,32(%r8,%r11,8)
 adc `$'0,%r9
 #dec %r15
-sub $1,%r15
+sub `$'1,%r15
 mov %r9,(%r8,%r14,8)
 ')
 
@@ -269,7 +269,7 @@ add %rbx,24(%r8,%r11,8)
 mov 8(%r8,%r14,8),%r13
 adc `$'0,%r12
 #dec %r15
-sub $1,%r15
+sub `$'1,%r15
 mov %r12,(%r8,%r14,8)
 lea 8(%r8),%r8
 ')
@@ -305,7 +305,7 @@ add %r10,16(%r8,%r11,8)
 adc `$'0,%rbx
 mov %rbx,(%r8,%r14,8)
 #dec %r15
-sub $1,%r15
+sub `$'1,%r15
 lea 8(%r8),%r8
 ')
 
@@ -335,7 +335,7 @@ mov 8(%r8,%r14,8),%r13
 mov %r10,(%r8,%r14,8)
 lea 8(%r8),%r8
 #dec %r15
-sub $1,%r15
+sub `$'1,%r15
 ')
 
 # change r8 to r12
