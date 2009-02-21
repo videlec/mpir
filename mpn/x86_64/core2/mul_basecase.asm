@@ -84,7 +84,8 @@ define(`MULNEXT0',`
 	adc `$'0,%rdx
 	mov %r12,32(%rdi,%r11,8)
 	mov %rdx,40(%rdi,%r11,8)
-	inc %r8
+	#inc %r8
+	add $1,%r8
 	mov (%rsi,%r14,8),%rax
 	mov %r14,%r11
 ')
@@ -103,7 +104,8 @@ define(`MULNEXT1',`
 	adc `$'0,%rdx
 	mov %r12,24(%rdi,%r11,8)
 	mov %rdx,32(%rdi,%r11,8)
-	inc %r8
+	#inc %r8
+	add $1,%r8
 	lea 8(%rdi),%rdi
 ')
 
@@ -116,7 +118,8 @@ define(`MULNEXT2',`
 	adc %rdx,%rbx
 	mov %r10,16(%rdi,%r11,8)
 	mov %rbx,24(%rdi,%r11,8)
-	inc %r8
+	#inc %r8
+	add $1,%r8
 	mov (%rsi,%r14,8),%rax
 	mov %r14,%r11
 ')
@@ -124,7 +127,8 @@ define(`MULNEXT2',`
 define(`MULNEXT3',`
 	mov %r9,8(%rdi,%r11,8)
 	mov %r10,16(%rdi,%r11,8)
-	inc %r8
+	#inc %r8
+	add $1,%r8
 	lea 8(%rdi),%rdi
 ')
 
@@ -205,7 +209,8 @@ adc %rdx,%r10
 	add %r12,32(%rdi,%r11,8)
 	mov (%rsi,%r14,8),%rax
 	adc `$'0,%rdx
-	inc %r8
+	#inc %r8
+	add $1,%r8
 	mov %rdx,40(%rdi,%r11,8)
 	mov %r14,%r11	
 	#lea 8(%rdi),%rdi
@@ -242,7 +247,8 @@ adc %rdx,%r10
 	add %r12,24(%rdi,%r11,8)
 	adc `$'0,%rdx
 	mov %rdx,32(%rdi,%r11,8)
-	inc %r8
+	#inc %r8
+	add $1,%r8
 	lea 8(%rdi),%rdi
 ')
 
@@ -272,7 +278,8 @@ adc %rdx,%r10
 	add %r10,16(%rdi,%r11,8)
 	adc `$'0,%rbx
 	mov %rbx,24(%rdi,%r11,8)
-	inc %r8
+	#inc %r8
+	add $1,%r8
 	mov %r14,%r11	
 ')
 
@@ -296,7 +303,8 @@ adc %rdx,%r10
 	add %r9,8(%rdi,%r11,8)
 	adc `$'0,%r10
 	mov %r10,16(%rdi,%r11,8)
-	inc %r8
+	#inc %r8
+	add $1,%r8
 	lea 8(%rdi),%rdi
 ')
 

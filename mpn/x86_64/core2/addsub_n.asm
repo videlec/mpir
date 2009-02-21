@@ -51,7 +51,8 @@ lp1:
 	adc	(%rsi,%r8,8),%r9
 	sbb	%r10,%r10
 	mov	%r9,(%rdi,%r8,8)
-	inc	%r8
+	#inc	%r8
+	add	$1,%r8
 	test	$3,%r8
 	jnz lp1
 next:

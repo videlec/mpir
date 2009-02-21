@@ -44,7 +44,8 @@ lp1:
 	sbb	(%rdx,%rcx,8),%r10
 	sbb	%rax,%rax
 	mov	%r10,(%rdi,%rcx,8)
-	inc	%rcx
+	#inc	%rcx
+	add	$1,%rcx
 	test	$3,%rcx
 	jnz lp1
 next:

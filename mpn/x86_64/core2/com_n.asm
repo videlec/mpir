@@ -49,12 +49,14 @@ jz	end
 mov	-8(%rsi,%rdx,8),%rax
 not	%rax
 mov	%rax,-8(%rdi,%rdx,8)
-dec	%rdx
+#dec	%rdx
+sub	$1,%rdx
 jz	end
 mov	-8(%rsi,%rdx,8),%rax
 not	%rax
 mov	%rax,-8(%rdi,%rdx,8)
-dec	%rdx
+#dec	%rdx
+sub	$1,%rdx
 jz	end
 mov	-8(%rsi,%rdx,8),%rax
 not	%rax

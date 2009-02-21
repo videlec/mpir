@@ -75,7 +75,8 @@ je aligned
 	psllq %xmm0,%xmm4
 	por %xmm3,%xmm4
 	movq %xmm4,-8(%rdi,%r8,8)
-	dec %r8
+	#dec %r8
+	sub $1,%r8
 aligned:
 sub $5,%r8
 jle skiploop

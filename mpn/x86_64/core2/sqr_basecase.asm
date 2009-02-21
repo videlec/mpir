@@ -84,7 +84,8 @@ define(`MULNEXT0',`
 	adc `$'0,%rdx
 	mov %r12,32(%rdi,%r11,8)
 	mov %rdx,40(%rdi,%r11,8)
-	inc %r14
+	#inc %r14
+	add $1,%r14
 	lea 8(%rdi),%rdi
 ')
 
@@ -102,7 +103,8 @@ define(`MULNEXT1',`
 	adc `$'0,%rdx
 	mov %r12,24(%rdi,%r11,8)
 	mov %rdx,32(%rdi,%r11,8)
-	inc %r14
+	#inc %r14
+	add $1,%r14
 	lea 8(%rdi),%rdi
 ')
 
@@ -115,14 +117,16 @@ define(`MULNEXT2',`
 	adc %rdx,%rbx
 	mov %r10,16(%rdi,%r11,8)
 	mov %rbx,24(%rdi,%r11,8)
-	inc %r14
+	#inc %r14
+	add $1,%r14
 	lea 8(%rdi),%rdi
 ')
 
 define(`MULNEXT3',`
 	mov %r9,8(%rdi,%r11,8)
 	mov %r10,16(%rdi,%r11,8)
-	inc %r14
+	#inc %r14
+	add $1,%r14
 	lea 8(%rdi),%rdi
 ')
 
@@ -190,7 +194,8 @@ adc %rax,%r12
 adc `$'0,%rdx
 add %r12,32(%rdi,%r11,8)
 adc `$'0,%rdx
-inc %r14
+#inc %r14
+add $1,%r14
 mov %rdx,40(%rdi,%r11,8)
 lea 8(%rdi),%rdi
 ')
@@ -215,7 +220,8 @@ adc `$'0,%rdx
 add %r12,24(%rdi,%r11,8)
 adc `$'0,%rdx
 mov %rdx,32(%rdi,%r11,8)
-inc %r14
+#inc %r14
+add $1,%r14
 lea 8(%rdi),%rdi
 ')
 
@@ -234,7 +240,8 @@ adc %rdx,%rbx
 add %r10,16(%rdi,%r11,8)
 adc `$'0,%rbx
 mov %rbx,24(%rdi,%r11,8)
-inc %r14
+#inc %r14
+add $1,%r14
 lea 8(%rdi),%rdi
 ')
 
@@ -247,7 +254,8 @@ adc %rdx,%r10
 add %r9,8(%rdi,%r11,8)
 adc `$'0,%r10
 mov %r10,16(%rdi,%r11,8)
-inc %r14
+#inc %r14
+add $1,%r14
 lea 8(%rdi),%rdi
 cmp `$'4,%r14
 jnz theloop
@@ -408,7 +416,8 @@ dialoop:
 	sbb %r11,%r11	
 	mov %r8,(%rdi)
 	mov %r9,8(%rdi)
-	inc %rcx
+	#inc %rcx
+	add $1,%rcx
 	lea 16(%rdi),%rdi
 	jnz dialoop
 mov -32(%rsp),%rbx
@@ -478,7 +487,8 @@ three:
 		sbb %r11,%r11	
 		mov %r8,(%rdi)
 		mov %r9,8(%rdi)
-		inc %rcx
+		#inc %rcx
+		add $1,%rcx
 		lea 16(%rdi),%rdi
 		jnz dialoop1
 	nop

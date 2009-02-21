@@ -73,7 +73,8 @@ je aligned
 	por %xmm5,%xmm4
 	movq %xmm4,(%rdi)
 	lea 8(%rdi),%rdi	
-	dec %rdx
+	#dec %rdx
+	sub $1,%rdx
 	movq %xmm2,%rax
 aligned:
 lea -40(%rdi,%rdx,8),%rdi
