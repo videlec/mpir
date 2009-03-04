@@ -201,6 +201,13 @@ MA 02110-1301, USA. */
 #include "mpir.h"
 #include "gmp-impl.h"
 
+#if 1 && defined( _MSC_VER)
+#define HAVE_GETRUSAGE      1
+#define HAVE_GETTIMEOFDAY   1
+#include "getrusage.h"
+#include "gettimeofday.h"
+#endif
+
 #include "speed.h"
 
 
@@ -948,7 +955,7 @@ speed_time_init (void)
       use_cycles = 1;
       DEFAULT (speed_cycletime, 1.0);
       speed_unittime = speed_cycletime;
-      DEFAULT (speed_precision, 10000);
+      DEFAULT (speed_precision, 1000000);
       strcpy (speed_time_string, "CPU cycle counter");
 
       /* only used if a supplementary method is chosen below */

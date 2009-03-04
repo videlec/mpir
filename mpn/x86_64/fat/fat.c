@@ -145,10 +145,12 @@ struct cpuvec_t __gmpn_cpuvec = {
   __MPN(mul_basecase_init),
   __MPN(preinv_divrem_1_init),
   __MPN(preinv_mod_1_init),
+  __MPN(redc_basecase_init),
   __MPN(rshift_init),
   __MPN(sqr_basecase_init),
   __MPN(sub_n_init),
   __MPN(submul_1_init),
+  __MPN(sumdiff_n_init),
   0
 };
 
@@ -227,6 +229,12 @@ __gmpn_cpuvec_init (void)
                 {
                   TRACE (printf ("  pentium3\n"));
                 }
+              if (model==15 || model==22 || model==23 || model==29)
+                 {TRACE (printf ("  core2\n"));
+                  CPUVEC_SETUP_core2;
+                  break;
+                 }
+
               break;
 
             case 15:

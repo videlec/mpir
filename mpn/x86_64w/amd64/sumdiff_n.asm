@@ -30,9 +30,9 @@
 ;  mp_limb_t __gmpn_sumdiff_n(
 ;       mp_ptr dps,         rcx
 ;       mp_ptr dpd,         rdx
-;       mp_srcptr r8,      r8
-;       mp_size_t r9,      r9
-;       mp_size_t n         r10d
+;       mp_srcptr src1,      r8
+;       mp_size_t src2,      r9
+;       mp_size_t n        r10d
 ; )
 ;
 ; This is an SEH frame function
@@ -80,7 +80,7 @@
 .2:	cmp     r10, 0
 	jz      .4
 
-	align   16
+	alignb  16, nop
 .3:	mov     rax, [r8+r10*8]
 	mov     rsi, [r8+r10*8+8]
 	mov     rdi, [r8+r10*8+16]

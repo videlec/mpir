@@ -24,9 +24,14 @@ include(`../config.m4')
 C	(rdi,rdx)=(rsi,rdx)>>rcx
 C	rax=carry
 
+C	decent assmeblers understand what movq means ,except
+C	microsofts/apple masm (what a suprise there) so for the broken old masm
+C	assembler.  Needed for movq reg64,mediareg and movq mediareg,reg64
+C	only , where mediareg is xmm or mm
+define(`MOVQ',`movd')
+
 ASM_START()
 PROLOGUE(mpn_rshift)
-# Version 1.0.4
 cmp $2,%rdx
 ja threeormore
 jz two
@@ -57,12 +62,12 @@ mov $64,%eax
 lea 8(%rsi),%r9
 sub %rcx,%rax
 and $-16,%r9
-movq %rcx,%xmm0
-movq %rax,%xmm1
+MOVQ %rcx,%xmm0
+MOVQ %rax,%xmm1
 movdqa (%r9),%xmm5
 movdqa %xmm5,%xmm3
 psllq %xmm1,%xmm5
-movq %xmm5,%rax
+MOVQ %xmm5,%rax
 cmp %r9,%rsi
 lea -40(%rsi,%rdx,8),%rsi
 je aligned
@@ -73,9 +78,8 @@ je aligned
 	por %xmm5,%xmm4
 	movq %xmm4,(%rdi)
 	lea 8(%rdi),%rdi	
-	#dec %rdx
 	sub $1,%rdx
-	movq %xmm2,%rax
+	MOVQ %xmm2,%rax
 aligned:
 lea -40(%rdi,%rdx,8),%rdi
 psrlq %xmm0,%xmm3
@@ -103,7 +107,6 @@ loop:
 	add $4,%r8
 	jnc loop
 skiploop:
-# have 3-r8 limbs left to do
 cmp $2,%r8
 ja left0
 jz left1

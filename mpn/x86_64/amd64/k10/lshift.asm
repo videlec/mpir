@@ -24,9 +24,14 @@ include(`../config.m4')
 C	(rdi,rdx)=(rsi,rdx)<<rcx
 C	rax=carry
 
+C	decent assmeblers understand what movq means ,except
+C	microsofts/apple masm (what a suprise there) so for the broken old masm
+C	assembler.  Needed for movq reg64,mediareg and movq mediareg,reg64
+C	only , where mediareg is xmm or mm
+define(`MOVQ',`movd')
+
 ASM_START()
 PROLOGUE(mpn_lshift)
-# Version 1.0.4
 cmp $2,%rdx
 ja threeormore
 jz two
@@ -55,8 +60,8 @@ two:
 threeormore:
 mov $64,%eax
 sub %rcx,%rax
-movq %rcx,%xmm0
-movq %rax,%xmm1
+MOVQ %rcx,%xmm0
+MOVQ %rax,%xmm1
 mov %rdx,%r8
 lea -16(%rsi,%r8,8),%r9
 mov %r9,%r10
@@ -65,13 +70,13 @@ movdqa (%r9),%xmm3
 movdqa %xmm3,%xmm5
 psrlq %xmm1,%xmm3
 pshufd $0x4E,%xmm3,%xmm3
-movq %xmm3,%rax
+MOVQ %xmm3,%rax
 cmp %r9,%r10
 je aligned 
 	movq -8(%rsi,%r8,8),%xmm2
 	movq %xmm2,%xmm4
 	psrlq %xmm1,%xmm2
-	movq %xmm2,%rax
+	MOVQ %xmm2,%rax
 	psllq %xmm0,%xmm4
 	por %xmm3,%xmm4
 	movq %xmm4,-8(%rdi,%r8,8)
@@ -107,7 +112,7 @@ je left2
 jg left3
 jp left1
 left0:
-# may be easier to bswap xmm5 first , same with other cases
+C may be easier to bswap xmm5 first , same with other cases
 	pxor %xmm2,%xmm2 
 	psllq %xmm0,%xmm5
 	movhlps %xmm2,%xmm3

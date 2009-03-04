@@ -22,7 +22,7 @@
 ;
 ;  Calling interface:
 ;
-;  r9[r9] = r8[r9] + 2 * r8[r9]
+;  r9[r9] = rax[r9] + 2 * rax[r9]
 ;
 ;  void __gmpn_com_n(
 ;     mp_ptr rp,          rcx
@@ -42,44 +42,44 @@
 %endif
 
 __gmpn_com_n:
-    mov     r8d, r8d
-	sub     r8, 4
+    mov     eax, r8d
+	sub     rax, 4
 	jc      .2
-
-	align   8
-.1: mov     rax, [rdx+r8*8+24]
-	mov     r9, [rdx+r8*8+16]
-	not     rax
+	
+	alignb  8, nop
+.1: mov     r8, [rdx+rax*8+24]
+	mov     r9, [rdx+rax*8+16]
+	not     r8
 	not     r9
-	mov     [rcx+r8*8+24], rax
-	mov     [rcx+r8*8+16], r9
-	mov     rax, [rdx+r8*8+8]
-	mov     r9, [rdx+r8*8]
-	not     rax
+	mov     [rcx+rax*8+24], r8
+	mov     [rcx+rax*8+16], r9
+	mov     r8, [rdx+rax*8+8]
+	mov     r9, [rdx+rax*8]
+	not     r8
 	not     r9
-	mov     [rcx+r8*8+8], rax
-	mov     [rcx+r8*8], r9
-	sub     r8, 4
+	mov     [rcx+rax*8+8], r8
+	mov     [rcx+rax*8], r9
+	sub     rax, 4
 	jae     .1
 
-.2: add     r8, 4
+.2: add     rax, 4
 	jz      .3
 
 ; Could still have potential cache-bank conflicts in this tail part
 
-	mov     rax, [rdx+r8*8-8]
-	not     rax
-	mov     [rcx+r8*8-8], rax
-	dec     r8
+	mov     r8, [rdx+rax*8-8]
+	not     r8
+	mov     [rcx+rax*8-8], r8
+	dec     rax
 	jz      .3
-	mov     rax, [rdx+r8*8-8]
-	not     rax
-	mov     [rcx+r8*8-8], rax
-	dec     r8
+	mov     r8, [rdx+rax*8-8]
+	not     r8
+	mov     [rcx+rax*8-8], r8
+	dec     rax
 	jz      .3
-	mov     rax, [rdx+r8*8-8]
-	not     rax
-	mov     [rcx+r8*8-8], rax
+	mov     r8, [rdx+rax*8-8]
+	not     r8
+	mov     [rcx+rax*8-8], r8
 
 .3: ret
 
