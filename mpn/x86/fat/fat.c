@@ -190,113 +190,11 @@ __gmpn_cpuvec_init (void)
     }
   else
     {
-      char vendor_string[13];
-      char dummy_string[12];
-      long fms;
-      int family, model;
 
-      __gmpn_cpuid (vendor_string, 0);
-      vendor_string[12] = 0;
+#define BIT64 0
+#define BIT32 1
+#include "fatcpuid.c"
 
-      fms = __gmpn_cpuid (dummy_string, 1);
-      family = (fms >> 8) & 15;
-      model = (fms >> 4) & 15;
-
-      if (strcmp (vendor_string, "GenuineIntel") == 0)
-        {
-          switch (family)
-            {
-            case 4:
-              TRACE (printf ("  80486 with cpuid\n"));
-              break;
-
-            case 5:
-              TRACE (printf ("  pentium\n"));
-              CPUVEC_SETUP_pentium;
-              if (model >= 4)
-                {
-                  TRACE (printf ("  pentiummmx\n"));
-                  CPUVEC_SETUP_pentium_mmx;
-                }
-              break;
-
-            case 6:
-              TRACE (printf ("  pentiumpro\n"));
-              CPUVEC_SETUP_p6;
-              if (model >= 2)
-                {
-                  TRACE (printf ("  pentium2\n"));
-                  CPUVEC_SETUP_p6_mmx;
-                }
-              if (model >= 7)
-                {
-                  TRACE (printf ("  pentium3\n"));
-                  CPUVEC_SETUP_p6_p3mmx;
-                }
-              break;
-
-            case 15:
-              TRACE (printf ("  pentium4\n"));
-              CPUVEC_SETUP_pentium4;
-              CPUVEC_SETUP_pentium4_mmx;
-              CPUVEC_SETUP_pentium4_sse2;
-              break;
-            }
-        }
-      else if (strcmp (vendor_string, "AuthenticAMD") == 0)
-        {
-          switch (family)
-            {
-            case 5:
-              if (model <= 3)
-                {
-                  TRACE (printf ("  k5\n"));
-                }
-              else
-                {
-                  TRACE (printf ("  k6\n"));
-                  CPUVEC_SETUP_k6;
-                  CPUVEC_SETUP_k6_mmx;
-                  if (model >= 8)
-                    {
-                      TRACE (printf ("  k62\n"));
-                      CPUVEC_SETUP_k6_k62mmx;
-                    }
-                  if (model >= 9)
-                    {
-                      TRACE (printf ("  k63\n"));
-                    }
-                }
-              break;
-            case 6:
-              TRACE (printf ("  athlon\n"));
-            athlon:
-              CPUVEC_SETUP_k7;
-              CPUVEC_SETUP_k7_mmx;
-              break;
-            case 15:
-              TRACE (printf ("  x86_64\n"));
-              goto athlon;
-            }
-        }
-      else if (strcmp (vendor_string, "CentaurHauls") == 0)
-        {
-          switch (family)
-            {
-            case 6:
-              TRACE (printf ("  viac3\n"));
-              if (model >= 9)
-                {
-                  TRACE (printf ("  viac32\n"));
-                }
-              break;
-            }
-        }
-      else if (strcmp (vendor_string, "CyrixInstead") == 0)
-        {
-          /* Should recognize Cyrix' processors too.  */
-          TRACE (printf ("  cyrix something\n"));
-        }
     }
 
   /* There's no x86 generic mpn_preinv_divrem_1 or mpn_preinv_mod_1.
