@@ -78,7 +78,7 @@
               TRACE (printf ("  netburst\n"));
               __gmpn_cpuid (dummy_string, 0x80000001);
               if( (dummy_string[8] & 1) )
-                {CPUVEC_SETUP_netburst_lahf; break;}
+                {CPUVEC_SETUP_netburst_netburstlahf; break;}
               else
                 {CPUVEC_SETUP_netburst; break;}
             #endif
