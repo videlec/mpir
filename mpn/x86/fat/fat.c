@@ -191,9 +191,37 @@ __gmpn_cpuvec_init (void)
   else
     {
 
-#define BIT64 0
-#define BIT32 1
-#include "fatcpuid.c"
+
+#define CONFIG_GUESS            0
+#define CONFIG_GUESS_32BIT      0
+#define CONFIG_GUESS_64BIT      0
+#define FAT32                   1
+#define FAT64                   0
+#define INFAT                   1
+
+#define CPUSETUP_pentium	CPUVEC_SETUP_pentium
+#define CPUSETUP_pentiummmx	CPUVEC_SETUP_pentium;CPUVEC_SETUP_pentium_mmx
+#define CPUSETUP_pentiumpro	CPUVEC_SETUP_p6
+#define CPUSETUP_pentium2	CPUVEC_SETUP_p6;CPUVEC_SETUP_p6_mmx
+#define CPUSETUP_pentium3	CPUVEC_SETUP_p6;CPUVEC_SETUP_p6_mmx;CPUVEC_SETUP_p6_p3mmx
+#define CPUSETUP_core		CPUVEC_SETUP_p6;CPUVEC_SETUP_p6_mmx;CPUVEC_SETUP_p6_p3mmx
+#define CPUSETUP_core2		CPUVEC_SETUP_p6;CPUVEC_SETUP_p6_mmx;CPUVEC_SETUP_p6_p3mmx
+#define CPUSETUP_penryn		CPUVEC_SETUP_p6;CPUVEC_SETUP_p6_mmx;CPUVEC_SETUP_p6_p3mmx
+#define CPUSETUP_nehalem	CPUVEC_SETUP_p6;CPUVEC_SETUP_p6_mmx;CPUVEC_SETUP_p6_p3mmx
+#define CPUSETUP_atom		CPUVEC_SETUP_p6;CPUVEC_SETUP_p6_mmx;CPUVEC_SETUP_p6_p3mmx
+#define CPUSETUP_pentium4	CPUVEC_SETUP_pentium4;CPUVEC_SETUP_pentium4_mmx;CPUVEC_SETUP_pentium4_sse2
+#define CPUSETUP_prescott	CPUVEC_SETUP_pentium4;CPUVEC_SETUP_pentium4_mmx;CPUVEC_SETUP_pentium4_sse2
+#define CPUSETUP_k5		do{}while(0)
+#define CPUSETUP_k6		CPUVEC_SETUP_k6;CPUVEC_SETUP_k6_mmx
+#define CPUSETUP_k62		CPUVEC_SETUP_k6;CPUVEC_SETUP_k6_mmx;CUPVEC_SETUP_k6_k62mmx
+#define CPUSETUP_k63		CPUVEC_SETUP_k6;CPUVEC_SETUP_k6_mmx;CUPVEC_SETUP_k6_k62mmx
+#define CPUSETUP_athlon		CPUVEC_SETUP_k7;CPUVEC_SETUP_k7_mmx
+#define CPUSETUP_k8		CPUVEC_SETUP_k7;CPUVEC_SETUP_k7_mmx
+#define CPUSETUP_k10		CPUVEC_SETUP_k7;CPUVEC_SETUP_k7_mmx
+#define CPUSETUP_viac3		do{}while(0)
+#define CPUSETUP_viac32		do{}while(0)
+
+#include "cpuid.c"
 
     }
 

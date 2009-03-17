@@ -2,3 +2,6 @@ we seem to have a few x86_64.def in various directorys
 
 only want one set of cpuid code , we have config.guess and two copys of fat.c
 
+
+just got cpuid.c fatcpuid.c now
+

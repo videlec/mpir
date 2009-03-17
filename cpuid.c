@@ -1,6 +1,13 @@
+// this should return the microarchitecture , NOT which code path we think is best
 
-main ()
-{
+#if CONFIG_GUESS
+// use's the stringinzing directive  #x   so MODELSTR(teddy)  expands to modelstr="teddy"
+#define CPUIS(x)	modelstr=#x
+#endif
+#if INFAT
+#define CPUIS(x)	do{TRACE(printf("  "#x"\n"));CPUSETUP_##x##;}while(0)
+#endif
+
   char vendor_string[13];
   char features[12];
   long fms;
@@ -16,46 +23,48 @@ main ()
   model = ((fms >> 4) & 15) + ((fms >> 12) & 0xf0);
   stepping = fms & 15;
   
-  #if BIT64
+  #if CONFIG_GUESS_64BIT
   modelstr = "x86_64";
   #else
-  modelstr = "i486";// shouldn't we make this x86
+  modelstr = "i486";// shouldn't we make this x86??
   #endif
 
   if (strcmp (vendor_string, "GenuineIntel") == 0)
     {
       switch (family)
 	{
-	#if BIT32
+	#if CONFIG_GUESS_32BIT || FAT32
 	case 5:
-	  if (model <= 2) { modelstr = "pentium";break;}
-	  if (model >= 4) { modelstr = "pentiummmx";break;}
+	  if (model <= 2) CPUIS(pentium);
+	  if (model >= 4) CPUIS(pentiummmx);
 	  break;
         #endif
 	case 6:
-	  #if BIT32
-	  if (model == 1) { modelstr = "pentiumpro";break;}
-	  if (model <= 6) { modelstr = "pentium2";break;}
-	  if (model <= 13){ modelstr = "pentium3";break;}
-	  if (model == 14){ modelstr = "core";break;}
+	  #if CONFIG_GUESS_32BIT || FAT32
+	  if (model == 1) { CPUIS(pentiumpro);break;}
+	  if (model <= 6) { CPUIS(pentium2);break;}
+	  if (model <= 13){ CPUIS(pentium3);break;}
+	  if (model == 14){ CPUIS(core);break;}
 	  #endif
-	  if (model == 15){ modelstr = "core2";break;}
-	  if (model == 22){ modelstr = "core2";break;}
-	  if (model == 23){ modelstr = "penryn";break;}
-	  if (model == 26){ modelstr = "nehalem";break;}
-	  if (model == 28){ modelstr = "atom";break;}
-	  if (model == 29){ modelstr = "penryn";break;}
-	  // modelstr = "core2";   // could fall back to core2
+	  //#if CONFIG_GUESS || FAT64
+	  if (model == 15){ CPUIS(core2);break;}
+	  if (model == 22){ CPUIS(core2);break;}
+	  if (model == 23){ CPUIS(penryn);break;}
+	  if (model == 26){ CPUIS(nehalem);break;}
+	  if (model == 28){ CPUIS(atom);break;}
+	  if (model == 29){ CPUIS(penryn);break;}
+	  //#endif
       	  break;
         case 15:
-        #if BIT64
+        #if CONFIG_GUESS_64BIT || FAT64
           cpuid(features,0x80000001);
-          if ( features[8]&1 ){ modelstr = "netburstlahf";break;}
-          modelstr = "netburst"
-        #else
-	  if (model <= 6) { modelstr = "pentium4";break;}
+          if ( features[8]&1 ){ CPUIS(netburstlahf);break;}
+          CPUIS(netburst);
+        #endif
+        #if CONFIG_GUESS_32BIT || FAT32
+	  if (model <= 6) { CPUIS(pentium4);break;}
 	  int feat = ((int *)features)[2];
-          if (feat & 1) { modelstr = "prescott";break;}
+          if (feat & 1) { CPUIS(prescott);break;}
         #endif
           break;
 	}
@@ -64,25 +73,29 @@ main ()
     {
       switch (family)
 	{
-	#if BIT32
+	#if CONFIG_GUESS_32BIT || FAT32
 	case 5:
-	  if (model <= 3) { modelstr = "k5";break;}
-	  if (model <= 7) { modelstr = "k6";break;}
-	  if (model <= 8) { modelstr = "k62";break;}
-	  if (model <= 9) { modelstr = "k63";break;}
+	  if (model <= 3) { CPUIS(k5);break;}
+	  if (model <= 7) { CPUIS(k6);break;}
+	  if (model <= 8) { CPUIS(k62);break;}
+	  if (model <= 9) { CPUIS(k63);break;}
 	  break;
 	case 6:
-	  modelstr = "athlon";break;
-        #endif
-	case 15:
-	  modelstr = "k8";break;
-	case 16:
-	  if (model == 2) { modelstr = "k10";break;} // phenom
-	  if (model == 4) { modelstr = "k10";break;} //phenom II
+	  CPUIS(athlon);
 	  break;
+        #endif
+        //#if CONFIG_GUESS || FAT64
+	case 15:
+	  CPUIS(k8);
+	  break;
+	case 16:
+	  if (model == 2) { CPUIS(k10);break;} // phenom
+	  if (model == 4) { CPUIS(k10);break;} //phenom II
+	  break;
+        //#endif
 	}
     }
-  #if BIT32
+  #if CONFIG_GUESS_32 || FAT32
   else if (strcmp (vendor_string, "CyrixInstead") == 0)
     {
       /* Should recognize Cyrix' processors too.  */
@@ -92,11 +105,8 @@ main ()
       switch (family)
 	{
 	case 6:
-	  if (model < 9) { modelstr = "viac3";break;}
-	  modelstr = "viac32";break;
+	  if (model < 9) { CPUIS(viac3);break;}
+	  CPUIS(viac32);break;
 	}
     }
   #endif
-  printf ("%s\n", modelstr);
-  return 0;
-}

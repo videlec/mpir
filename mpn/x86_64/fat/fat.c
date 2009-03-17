@@ -191,9 +191,23 @@ __gmpn_cpuvec_init (void)
   else
     {
 
-#define BIT32 0
-#define BIT64 1
-#include "fatcpuid.c"
+#define CONFIG_GUESS            0
+#define CONFIG_GUESS_32BIT      0
+#define CONFIG_GUESS_64BIT      0
+#define FAT32                   0
+#define FAT64                   1
+#define INFAT                   1
+
+#define CPUSETUP_core2		CPUVEC_SETUP_core2
+#define CPUSETUP_penryn		CPUVEC_SETUP_core2;CPUVEC_SETUP_core_penryn
+#define CPUSETUP_nehalem	CPUVEC_SETUP_nehalem
+#define CPUSETUP_atom		CPUVEC_SETUP_atom
+#define CPUSETUP_netburst	CPUVEC_SETUP_netburst
+#define CPUSETUP_netburstlahf	CPUVEC_SETUP_netburst;CPUVEC_SETUP_netburst_netburstlahf
+#define CPUSETUP_k8		CPUVEC_SETUP_k8
+#define CPUSETUP_k10		CPUVEC_SETUP_k8;CPUVEC_SETUP_k8_k10
+
+#include "cpuid.c"
 
     }
   /* There's no x86 generic mpn_preinv_divrem_1 or mpn_preinv_mod_1.
