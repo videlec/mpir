@@ -36,6 +36,7 @@
 
 # Expect to find configfsf.guess in the same directory as this config.guess
 configfsf_guess="`echo \"$0\" | sed 's/config.guess$/configfsf.guess/'`"
+cpuid_c_path="`echo \"$0\" | sed 's/config.guess$/cpuid.c/'`"
 if test "$configfsf_guess" = "$0"; then
   echo "Cannot derive configfsf.guess from $0" 1>&2
   exit 1
@@ -721,38 +722,12 @@ EOF
       esac
       
       cat <<EOF >>${dummy}2.c
-/*  
-#define TRACE(x)
-#define __gmpn_cpuid cpuid
-#define BIT64 1
-#define CPUVEC_SETUP_atom  do{}while(0)
-#define CPUVEC_SETUP_nehalem  do{}while(0)
-#define CPUVEC_SETUP_k8  do{}while(0)
-#define CPUVEC_SETUP_k8_k10  do{}while(0)
-#define CPUVEC_SETUP_core2  do{}while(0)
-#define CPUVEC_SETUP_core2_penryn  do{}while(0)
-#define CPUVEC_SETUP_netburst  do{}while(0)
-#define CPUVEC_SETUP_netburst_netburstlahf  do{}while(0)
-#define BIT32 1
-#define CPUVEC_SETUP_pentium  do{}while(0)
-#define CPUVEC_SETUP_pentium_mmx  do{}while(0)
-#define CPUVEC_SETUP_p6  do{}while(0)
-#define CPUVEC_SETUP_p6_mmx  do{}while(0)
-#define CPUVEC_SETUP_p6_p3mmx  do{}while(0)
-#define CPUVEC_SETUP_pentium4  do{}while(0)
-#define CPUVEC_SETUP_pentium4_mmx  do{}while(0)
-#define CPUVEC_SETUP_pentium4_sse2  do{}while(0)
-#define CPUVEC_SETUP_k6  do{}while(0)
-#define CPUVEC_SETUP_k6_mmx  do{}while(0)
-#define CPUVEC_SETUP_k6_k62mmx  do{}while(0)
-#define CPUVEC_SETUP_k7  do{}while(0)
-#define CPUVEC_SETUP_k7_mmx  do{}while(0)
-*/
 
 main ()
 {
-  
-#include "cpuid.c"
+EOF
+echo "#include \"$cpuid_c_path\"" >> ${dummy}2.c
+   cat <<EOF >>${dummy}2.c
 
   printf ("%s\n", modelstr);
   
@@ -760,9 +735,7 @@ main ()
 }
 EOF
 
-	## FIXME put this back
-  if ($CC_FOR_BUILD -Wall -W ${dummy}1.s ${dummy}2.c -o $dummy) ; then
-  #if ($CC_FOR_BUILD ${dummy}1.s ${dummy}2.c -o $dummy) >/dev/null 2>&1; then
+  if ($CC_FOR_BUILD ${dummy}1.s ${dummy}2.c -o $dummy) >/dev/null 2>&1; then
     # On 80386 and early 80486 cpuid is not available and will result in a
     # SIGILL message, hence 2>/dev/null.
     #

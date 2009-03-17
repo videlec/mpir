@@ -199,7 +199,7 @@ __gmpn_cpuvec_init (void)
 #define INFAT                   1
 
 #define CPUSETUP_core2		CPUVEC_SETUP_core2
-#define CPUSETUP_penryn		CPUVEC_SETUP_core2;CPUVEC_SETUP_core_penryn
+#define CPUSETUP_penryn		CPUVEC_SETUP_core2;CPUVEC_SETUP_core2_penryn
 #define CPUSETUP_nehalem	CPUVEC_SETUP_nehalem
 #define CPUSETUP_atom		CPUVEC_SETUP_atom
 #define CPUSETUP_netburst	CPUVEC_SETUP_netburst

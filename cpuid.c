@@ -3,9 +3,10 @@
 #if CONFIG_GUESS
 // use's the stringinzing directive  #x   so MODELSTR(teddy)  expands to modelstr="teddy"
 #define CPUIS(x)	modelstr=#x
+#define __gmpn_cpuid	cpuid
 #endif
 #if INFAT
-#define CPUIS(x)	do{TRACE(printf("  "#x"\n"));CPUSETUP_##x##;}while(0)
+#define CPUIS(x)	do{TRACE(printf("  "#x"\n"));CPUSETUP_##x;}while(0)
 #endif
 
   char vendor_string[13];
@@ -14,10 +15,10 @@
   int family, model, stepping;
   char *modelstr;
 
-  cpuid (vendor_string, 0);
+  __gmpn_cpuid (vendor_string, 0);
   vendor_string[12] = 0;
 
-  fms = cpuid (features, 1);
+  fms = __gmpn_cpuid (features, 1);
 
   family = ((fms >> 8) & 15) + ((fms >> 20) & 0xff);
   model = ((fms >> 4) & 15) + ((fms >> 12) & 0xf0);
@@ -57,7 +58,7 @@
       	  break;
         case 15:
         #if CONFIG_GUESS_64BIT || FAT64
-          cpuid(features,0x80000001);
+          __gmpn_cpuid(features,0x80000001);
           if ( features[8]&1 ){ CPUIS(netburstlahf);break;}
           CPUIS(netburst);
         #endif
