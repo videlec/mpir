@@ -47,15 +47,13 @@
 	  if (model <= 13){ CPUIS(pentium3);break;}
 	  if (model == 14){ CPUIS(core);break;}
 	  #endif
-	  //#if CONFIG_GUESS || FAT64
 	  if (model == 15){ CPUIS(core2);break;}
 	  if (model == 22){ CPUIS(core2);break;}
 	  if (model == 23){ CPUIS(penryn);break;}
 	  if (model == 26){ CPUIS(nehalem);break;}
 	  if (model == 28){ CPUIS(atom);break;}
 	  if (model == 29){ CPUIS(penryn);break;}
-	  //#endif
-      	  break;
+	  break;
         case 15:
         #if CONFIG_GUESS_64BIT || FAT64
           __gmpn_cpuid(features,0x80000001);
@@ -85,16 +83,14 @@
 	  CPUIS(athlon);
 	  break;
         #endif
-        //#if CONFIG_GUESS || FAT64
-	case 15:
+        case 15:
 	  CPUIS(k8);
 	  break;
 	case 16:
 	  if (model == 2) { CPUIS(k10);break;} // phenom
 	  if (model == 4) { CPUIS(k10);break;} //phenom II
 	  break;
-        //#endif
-	}
+        }
     }
   #if CONFIG_GUESS_32 || FAT32
   else if (strcmp (vendor_string, "CyrixInstead") == 0)

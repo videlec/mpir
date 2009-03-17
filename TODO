@@ -1,8 +1,0 @@
-we seem to have a few x86_64.def in various directorys 
-
-just got one cpuid.c not 3 copys
-
-as cpuid.c doesn't appear in the build system , put in in make dist etc in
-makefile.am
-
-
