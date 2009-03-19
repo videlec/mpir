@@ -691,6 +691,12 @@ speed_mpn_divexact_byff (struct speed_params *s)
   SPEED_ROUTINE_MPN_COPY (mpn_divexact_byff);
 }
 
+double
+speed_mpn_divexact_byBm1of (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_DIVEXACT_BYBM1OF (mpn_divexact_byBm1of);
+}
+
 #if HAVE_NATIVE_mpn_modexact_1_odd
 double
 speed_mpn_modexact_1_odd (struct speed_params *s)
