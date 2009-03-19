@@ -1393,7 +1393,7 @@ case $host in
         gcc_cflags_cpu="-mtune=k6-3 -mcpu=k6-3 -mcpu=k6 -mcpu=i486 -m486"
         gcc_cflags_arch="-march=k6-3 -march=k6"
         ;;
-      athlon)
+      k7 | athlon)
         # Athlon instruction costs are close to P6 (3 cycle load latency,
         # 4-6 cycle mul, 40 cycle div, pairable adc, etc) so if gcc doesn't
         # know athlon (eg. 2.95.2 doesn't) then fall back on pentiumpro.
@@ -1455,7 +1455,7 @@ case $host in
       k6)                      path="x86/k6/mmx x86/k6 x86" ;;
       # we don't have any specific 32-bit code for opteron (x86_64), the
       # athlon code should be reasonable
-      athlon | x86_64 | k8 | k10 | atom)   path="x86/k7/mmx x86/k7 x86" ;;
+      athlon | k7 | x86_64 | k8 | k10 | atom)   path="x86/k7/mmx x86/k7 x86" ;;
       i786 | pentium4 | core2 | penryn | nehalem) path="x86/pentium4/sse2 x86/pentium4/mmx x86/pentium4 x86" ;;
       prescott | netburst | netburstlahf)       path="x86/pentium4/sse2 x86/pentium4/mmx x86/pentium4 x86" ;;
       # VIA/Centaur processors, sold as CyrixIII and C3.

@@ -80,7 +80,7 @@
 	  if (model <= 9) { CPUIS(k63);break;}
 	  break;
 	case 6:
-	  CPUIS(athlon);
+	  CPUIS(k7);
 	  break;
         #endif
         case 15:
