@@ -119,6 +119,11 @@ MA 02110-1301, USA. */
 #include <string.h>
 #include <time.h>
 
+#if defined( _MSC_VER )
+#define WINDOWS_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -142,7 +147,7 @@ extern int optind, opterr;
 extern int sys_nerr;
 #endif
 
-#if ! HAVE_DECL_SYS_ERRLIST
+#if ! HAVE_DECL_SYS_ERRLIST && !defined( _MSC_VER )
 extern char *sys_errlist[];
 #endif
 
@@ -241,7 +246,7 @@ struct region_t {
 int trap_location = TRAP_NOWHERE;
 
 
-#define NUM_SOURCES  2
+#define NUM_SOURCES  3
 #define NUM_DESTS    2
 
 struct source_t {
@@ -303,8 +308,8 @@ typedef mp_limb_t (*tryfun_t) _PROTO ((ANYARGS));
 struct try_t {
   char  retval;
 
-  char  src[2];
-  char  dst[2];
+  char  src[NUM_SOURCES];
+  char  dst[NUM_DESTS];
 
 #define SIZE_YES          1
 #define SIZE_ALLOW_ZERO   2
@@ -321,14 +326,15 @@ struct try_t {
 #define SIZE_CEIL_HALF   13
 #define SIZE_GET_STR     14
 #define SIZE_PLUS_MSIZE_SUB_1 15  /* size+msize-1 */
+#define SIZE_DOUBLE	16
   char  size;
   char  size2;
-  char  dst_size[2];
+  char  dst_size[NUM_DESTS];
 
   /* multiplier_N size in limbs */
   mp_size_t  msize;
 
-  char  dst_bytes[2];
+  char  dst_bytes[NUM_DESTS];
 
   char  dst0_from_src1;
 
@@ -356,6 +362,7 @@ struct try_t {
 #define DATA_SRC1_HIGHBIT     4
 #define DATA_MULTIPLE_DIVISOR 5
 #define DATA_UDIV_QRNND       6
+#define DATA_SRC0_ODD	      7
   char  data;
 
 /* Default is allow full overlap. */
@@ -374,7 +381,6 @@ struct try_t {
 };
 
 struct try_t  *tr;
-
 
 void
 validate_mod_34lsub1 (void)
@@ -645,7 +651,16 @@ validate_sqrtrem (void)
 #define TYPE_POPCOUNT         103
 #define TYPE_HAMDIST          104
 
-#define TYPE_EXTRA            110
+#define TYPE_DIVEXACT_BYFF    105
+#define TYPE_LSHIFT1	      106
+#define TYPE_RSHIFT1	      107
+
+#define TYPE_ADDADD_N	      108
+#define TYPE_ADDSUB_N	      109
+
+#define TYPE_REDC_BASECASE	110
+
+#define TYPE_EXTRA            120
 
 struct try_t  param[150];
 
@@ -828,7 +843,6 @@ param_init (void)
   COPY (TYPE_AND_N);
   REFERENCE (refmpn_xnor_n);
 
-
   p = &param[TYPE_SUMDIFF_N];
   p->retval = 1;
   p->dst[0] = 1;
@@ -841,6 +855,23 @@ param_init (void)
   COPY (TYPE_SUMDIFF_N);
   p->carry = CARRY_4;
   REFERENCE (refmpn_sumdiff_nc);
+
+  p = &param[TYPE_ADDADD_N];
+  p->retval = 1;
+  p->dst[0] = 1;
+  p->src[0] = 1;
+  p->src[1] = 1;
+  p->src[2] = 1;
+  REFERENCE (refmpn_addadd_n);
+
+  p = &param[TYPE_ADDSUB_N];
+  p->retval = 1;
+  p->dst[0] = 1;
+  p->src[0] = 1;
+  p->src[1] = 1;
+  p->src[2] = 1;
+  REFERENCE (refmpn_addsub_n);
+
 
 
   p = &param[TYPE_COPY];
@@ -966,6 +997,24 @@ param_init (void)
   p->src[0] = 1;
   REFERENCE (refmpn_divexact_by3);
 
+  p = &param[TYPE_DIVEXACT_BYFF];
+  p->retval = 1;
+  p->dst[0] = 1;
+  p->src[0] = 1;
+  REFERENCE (refmpn_divexact_byff);
+
+  p = &param[TYPE_LSHIFT1];
+  p->retval = 1;
+  p->dst[0] = 1;
+  p->src[0] = 1;
+  REFERENCE (refmpn_lshift1);
+
+  p = &param[TYPE_RSHIFT1];
+  p->retval = 1;
+  p->dst[0] = 1;
+  p->src[0] = 1;
+  REFERENCE (refmpn_rshift1);
+
   p = &param[TYPE_DIVEXACT_BY3C];
   COPY (TYPE_DIVEXACT_BY3);
   p->carry = CARRY_3;
@@ -1046,6 +1095,14 @@ param_init (void)
   COPY (TYPE_MPZ_KRONECKER_UI);
   REFERENCE (refmpz_si_kronecker);
 
+  p = &param[TYPE_REDC_BASECASE];
+  p->dst[0] = 1;
+  p->src[0] = 1;
+  p->src[1] = 1;
+  p->data = DATA_SRC0_ODD ;
+  p->size2 = SIZE_DOUBLE;
+  p->overlap = OVERLAP_NONE;
+  REFERENCE (refmpn_redc_basecase);
 
   p = &param[TYPE_SQR];
   p->dst[0] = 1;
@@ -1234,6 +1291,18 @@ mpn_divexact_by3_fun (mp_ptr rp, mp_srcptr sp, mp_size_t size)
 }
 
 mp_limb_t
+mpn_lshift1_fun (mp_ptr rp, mp_srcptr sp, mp_size_t size)
+{
+  return mpn_lshift1 (rp, sp, size);
+}
+
+mp_limb_t
+mpn_rshift1_fun (mp_ptr rp, mp_srcptr sp, mp_size_t size)
+{
+  return mpn_rshift1 (rp, sp, size);
+}
+
+mp_limb_t
 mpn_modexact_1_odd_fun (mp_srcptr ptr, mp_size_t size, mp_limb_t divisor)
 {
   return mpn_modexact_1_odd (ptr, size, divisor);
@@ -1324,6 +1393,13 @@ const struct choice_t choice_array[] = {
 #endif
 #if HAVE_NATIVE_mpn_sumdiff_nc
   { TRY(mpn_sumdiff_nc), TYPE_SUMDIFF_NC },
+#endif
+
+#if HAVE_NATIVE_mpn_addadd_n
+  { TRY(mpn_addadd_n),  TYPE_ADDADD_N  },
+#endif
+#if HAVE_NATIVE_mpn_addsub_n
+  { TRY(mpn_addsub_n),  TYPE_ADDSUB_N  },
 #endif
 
   { TRY(mpn_addmul_1),  TYPE_ADDMUL_1  },
@@ -1425,6 +1501,9 @@ const struct choice_t choice_array[] = {
 
   { TRY(mpn_divexact_1),          TYPE_DIVEXACT_1 },
   { TRY_FUNFUN(mpn_divexact_by3), TYPE_DIVEXACT_BY3 },
+  { TRY(mpn_divexact_byff),       TYPE_DIVEXACT_BYFF },
+  { TRY_FUNFUN(mpn_lshift1),	  TYPE_LSHIFT1 },
+  { TRY_FUNFUN(mpn_rshift1),	  TYPE_RSHIFT1 },
   { TRY(mpn_divexact_by3c),       TYPE_DIVEXACT_BY3C },
 
   { TRY_FUNFUN(mpn_modexact_1_odd), TYPE_MODEXACT_1_ODD },
@@ -1447,6 +1526,7 @@ const struct choice_t choice_array[] = {
 
 
   { TRY(mpn_mul_basecase), TYPE_MUL_BASECASE },
+  { TRY(mpn_redc_basecase), TYPE_REDC_BASECASE },
 #if SQR_KARATSUBA_THRESHOLD > 0
   { TRY(mpn_sqr_basecase), TYPE_SQR },
 #endif
@@ -1698,6 +1778,8 @@ struct overlap_t {
 
 struct overlap_t  *overlap, *overlap_limit;
 
+// FIXME : should this depend on NUM_SOURCES  ?
+// FIXME : we are indexing a C array shouldn't these numbers be one less ?
 #define OVERLAP_COUNT                   \
   (tr->overlap & OVERLAP_NONE       ? 1 \
    : tr->overlap & OVERLAP_NOT_SRCS ? 3 \
@@ -1999,6 +2081,16 @@ call (struct each_t *e, tryfun_t function)
       (e->d[0].p, e->d[1].p, e->s[0].p, e->s[1].p, size, carry);
     break;
 
+  case TYPE_ADDSUB_N:
+    e->retval = (int)CALLING_CONVENTIONS (function)
+      (e->d[0].p, e->s[0].p, e->s[1].p, e->s[2].p,size);
+    break;
+  case TYPE_ADDADD_N:
+    e->retval = CALLING_CONVENTIONS (function)
+      (e->d[0].p, e->s[0].p, e->s[1].p, e->s[2].p,size);
+    break;
+    
+
   case TYPE_COPY:
   case TYPE_COPYI:
   case TYPE_COPYD:
@@ -2010,6 +2102,17 @@ call (struct each_t *e, tryfun_t function)
   case TYPE_DIVEXACT_BY3:
     e->retval = CALLING_CONVENTIONS (function) (e->d[0].p, e->s[0].p, size);
     break;
+  case TYPE_DIVEXACT_BYFF:
+    e->retval = CALLING_CONVENTIONS (function) (e->d[0].p, e->s[0].p, size);
+    break;
+  case TYPE_LSHIFT1:
+    e->retval = CALLING_CONVENTIONS (function) (e->d[0].p, e->s[0].p, size);
+    break;
+  case TYPE_RSHIFT1:
+    e->retval = CALLING_CONVENTIONS (function) (e->d[0].p, e->s[0].p, size);
+    break;
+    
+
   case TYPE_DIVEXACT_BY3C:
     e->retval = CALLING_CONVENTIONS (function) (e->d[0].p, e->s[0].p, size,
 						carry);
@@ -2166,6 +2269,31 @@ call (struct each_t *e, tryfun_t function)
   case TYPE_MUL_BASECASE:
     CALLING_CONVENTIONS (function)
       (e->d[0].p, e->s[0].p, size, e->s[1].p, size2);
+    break;
+  case TYPE_REDC_BASECASE:
+    /* Sources are destroyed, so they're saved and replaced, but a general
+       approach to this might be better.  Note that it's still e->s[0].p and
+       e->s[1].p that are passed, to get the desired alignments. */
+    {
+      mp_limb_t Np;
+      mp_ptr  s0 = refmpn_malloc_limbs (size);
+      mp_ptr  s1 = refmpn_malloc_limbs (size2);
+      modlimb_invert(Np,e->s[0].p[0]);
+      Np=-Np;
+      refmpn_copyi (s0, e->s[0].p, size);
+      refmpn_copyi (s1, e->s[1].p, size2);
+
+      mprotect_region (&s[0].region, PROT_READ|PROT_WRITE);
+      mprotect_region (&s[1].region, PROT_READ|PROT_WRITE);
+      e->retval = CALLING_CONVENTIONS (function) (e->d[0].p,
+						  e->s[0].p, size,Np,
+						  e->s[1].p);
+      refmpn_copyi (e->s[0].p, s0, size);
+      refmpn_copyi (e->s[1].p, s1, size2);
+      free (s0);
+      free (s1);
+    }
+  
     break;
   case TYPE_MUL_N:
     CALLING_CONVENTIONS (function) (e->d[0].p, e->s[0].p, e->s[1].p, size);
@@ -2471,6 +2599,11 @@ try_one (void)
 	if (i == 1)
 	  s[i].p[0] |= 1;
 	break;
+	
+      case DATA_SRC0_ODD:
+	if (i == 0)
+	  s[i].p[0] |= 1;
+	break;
 
       case DATA_SRC1_HIGHBIT:
 	if (i == 1)
@@ -2574,6 +2707,7 @@ try_one (void)
 #define SIZE2_FIRST                                     \
   (tr->size2 == SIZE_2 ? 2                              \
    : tr->size2 == SIZE_FRACTION ? option_firstsize2     \
+   : tr->size2 == SIZE_DOUBLE ? size*2			\
    : tr->size2 ?                                        \
    MAX (choice->minsize, (option_firstsize2 != 0        \
 			  ? option_firstsize2 : 1))     \
@@ -2582,6 +2716,7 @@ try_one (void)
 #define SIZE2_LAST                                      \
   (tr->size2 == SIZE_2 ? 2                              \
    : tr->size2 == SIZE_FRACTION ? FRACTION_COUNT-1      \
+   : tr->size2 == SIZE_DOUBLE ? size*2			\
    : tr->size2 ? size                                   \
    : 0)
 
@@ -2615,6 +2750,7 @@ try_many (void)
     total *= option_repetitions;
     total *= option_lastsize;
     if (tr->size2 == SIZE_FRACTION) total *= FRACTION_COUNT;
+    else if (tr->size2 == SIZE_DOUBLE) total *= 1;
     else if (tr->size2)             total *= (option_lastsize+1)/2;
 
     total *= SHIFT_LIMIT;
@@ -2627,11 +2763,17 @@ try_many (void)
     total *= HIGH_COUNT (tr->dst[1]);
     total *= HIGH_COUNT (tr->src[0]);
     total *= HIGH_COUNT (tr->src[1]);
-
+    total *= HIGH_COUNT (tr->src[2]);
+    
     total *= ALIGN_COUNT (tr->dst[0]);
     total *= ALIGN_COUNT (tr->dst[1]);
     total *= ALIGN_COUNT (tr->src[0]);
     total *= ALIGN_COUNT (tr->src[1]);
+    total *= ALIGN_COUNT (tr->src[2]);
+
+#if NUM_SOURCES > 3 || NUM_DESTS > 2
+#error Need to adjust high_count and align_count above
+#endif
 
     total *= OVERLAP_COUNT;
 
@@ -2654,11 +2796,17 @@ try_many (void)
       HIGH_ITERATION(d,1, tr->dst[1])
       HIGH_ITERATION(s,0, tr->src[0])
       HIGH_ITERATION(s,1, tr->src[1])
+      HIGH_ITERATION(s,2, tr->src[2])
 
       ALIGN_ITERATION(d,0, tr->dst[0])
       ALIGN_ITERATION(d,1, tr->dst[1])
       ALIGN_ITERATION(s,0, tr->src[0])
       ALIGN_ITERATION(s,1, tr->src[1])
+      ALIGN_ITERATION(s,2, tr->src[2])
+
+#if NUM_SOURCES > 3 || NUM_DESTS > 2
+#error Need to adjust high_iteration and align_iteration above
+#endif
 
       OVERLAP_ITERATION
       try_one();
@@ -2712,17 +2860,19 @@ try_init (void)
   /* Prefer getpagesize() over sysconf(), since on SunOS 4 sysconf() doesn't
      know _SC_PAGESIZE. */
   pagesize = getpagesize ();
-#else
-#if HAVE_SYSCONF
+#elif HAVE_SYSCONF
   if ((pagesize = sysconf (_SC_PAGESIZE)) == -1)
     {
       /* According to the linux man page, sysconf doesn't set errno */
       fprintf (stderr, "Cannot get sysconf _SC_PAGESIZE\n");
       exit (1);
     }
+#elif defined( _MSC_VER )
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    pagesize = si.dwPageSize;
 #else
-Error, error, cannot get page size
-#endif
+#error Error, error, cannot get page size
 #endif
 
   printf ("pagesize is 0x%lX bytes\n", pagesize);

@@ -606,10 +606,33 @@ refmpn_add_n (mp_ptr rp, mp_srcptr s1p, mp_srcptr s2p, mp_size_t size)
 {
   return refmpn_add_nc (rp, s1p, s2p, size, CNST_LIMB(0));
 }
+
 mp_limb_t
 refmpn_sub_n (mp_ptr rp, mp_srcptr s1p, mp_srcptr s2p, mp_size_t size)
 {
   return refmpn_sub_nc (rp, s1p, s2p, size, CNST_LIMB(0));
+}
+
+mp_limb_t 
+refmpn_addadd_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_srcptr zp, mp_size_t n)
+{
+  mp_limb_t r;
+  mp_limb_t * tp = refmpn_malloc_limbs (n);
+  r = refmpn_add_n (tp, yp, zp, n);
+  r += mpn_add_n (rp, tp, xp, n);
+  free(tp);
+  return r;
+}
+
+int 
+refmpn_addsub_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_srcptr zp, mp_size_t n)
+{
+  mp_limb_t r;
+  mp_limb_t * tp = refmpn_malloc_limbs (n);
+  r = - mpn_sub_n (tp, yp, zp, n);
+  r += mpn_add_n (rp, tp, xp, n);
+  free(tp);
+  return r;
 }
 
 mp_limb_t
@@ -1015,6 +1038,17 @@ refmpn_lshift (mp_ptr rp, mp_srcptr sp, mp_size_t size, unsigned shift)
   return ret;
 }
 
+mp_limb_t 
+refmpn_lshift1(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+{
+	return refmpn_lshift (rp, xp, n, 1);
+}
+
+mp_limb_t 
+refmpn_rshift1(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+{
+	return refmpn_rshift (rp, xp, n, 1);
+}
 
 /* accepting shift==0 and doing a plain copyi or copyd in that case */
 mp_limb_t
@@ -1221,6 +1255,39 @@ refmpn_divrem_1 (mp_ptr rp, mp_size_t xsize,
                  mp_srcptr sp, mp_size_t size, mp_limb_t divisor)
 {
   return refmpn_divrem_1c (rp, xsize, sp, size, divisor, CNST_LIMB(0));
+}
+
+mp_limb_t 
+refmpn_divexact_byff(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+{
+  mp_limb_t r, cy;
+  mp_limb_t * tp;
+  mp_size_t i;
+  
+  tp = refmpn_malloc_limbs (n);
+
+  /* x = q1*(B - 1) + r1 */
+  r = refmpn_divrem_1 (rp, 0, xp, n, ~CNST_LIMB(0));
+  if (!r) return r; // r1 == 0
+  /* 0 < r1 < B - 1 
+     rp[n - 1] <= 1
+	  if n > 1 and rp[n - 1] == 1 then rp[n - 2] <= 1, etc  
+	  if all limbs are 1 then r == 0, already dealt with */
+
+  /* q = q1 + 1, -r = (B - 1) - r1, x = q*(B - 1) - r*/ 
+  refmpn_add_1(rp, rp, n, CNST_LIMB(1));
+  r = -(r + 1); 
+  /* rp[n - 1] <= 1 
+     if rp[n - 1] == 1 then rp[n - 1] <= 1, etc (***)*/
+  
+  /* x = q*(B - 1) + (B^n - 1)*r - (B^n - 1)*r - r
+       = (B - 1)*(q + r + r*B + r*B^2 + ... + r*B^(n-1)) - B^n*r */
+  for (i = 0; i < n; i++) tp[i] = r;
+  refmpn_add_n(rp, rp, tp, n); /* cannot have carry out of top limb due to (***) */
+  
+  free(tp);
+
+  return r;
 }
 
 mp_limb_t
@@ -1973,4 +2040,24 @@ refmpn_sqrtrem (mp_ptr sp, mp_ptr rp, mp_srcptr np, mp_size_t nsize)
   free (dp);
   free (tp);
   return ret;
+}
+
+void 
+refmpn_redc_basecase (mp_ptr cp, mp_srcptr mp, mp_size_t n, mp_limb_t Nd, mp_ptr tp)
+{
+  mp_limb_t cy, q;
+  mp_size_t j;
+      
+  ASSERT_MPN (tp, 2*n);
+        
+  for (j = 0; j < n; j++)
+  {
+    q = (tp[0] * Nd) & GMP_NUMB_MASK;
+    tp[0] = refmpn_addmul_1 (tp, mp, n, q);
+    tp++;
+  }
+   
+  cy = refmpn_add_n (cp, tp, tp - n, n);
+  
+  if (cy) refmpn_sub_n (cp, cp, mp, n);
 }

@@ -423,7 +423,7 @@ typedef __mpq_struct *mpq_ptr;
    case the function is called rather than inlined.  */
 
 #ifdef __GNUC__
-#ifdef __APPLE_CC__
+#if defined(__APPLE_CC__) && (__APPLE_CC__ != 1) /* FSF GCC sets this flag to 1 on Apple machines */
 
 #if ! (__APPLE_CC__ >= 5465 && __STDC_VERSION__ >= 199901L)
 #define __GMP_EXTERN_INLINE extern __inline__
@@ -2192,8 +2192,8 @@ enum
 #define __GNU_MP_VERSION_PATCHLEVEL 1
 #define GMP_VERSION "4.2.1"
 
-#define __MPIR_VERSION 0
-#define __MPIR_VERSION_MINOR 9
+#define __MPIR_VERSION 1
+#define __MPIR_VERSION_MINOR 0
 #define __MPIR_VERSION_PATCHLEVEL 0
 
 #define __GMP_H__

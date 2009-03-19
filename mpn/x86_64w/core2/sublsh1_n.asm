@@ -1,6 +1,6 @@
 
 ;  Core2 mpn_sublsh1_n
-;  Verdxon 1.0.3
+;  Version 1.0.3
 ;
 ;  Copyright 2008 Jason Moxham
 ;
@@ -9,8 +9,8 @@
 ;  This file is part of the MPIR Library.
 ;  The MPIR Library is free software; you can redistribute it and/or modify
 ;  it under the terms of the GNU Lesser General Public License as published
-;  by the Free Software Foundation; either verdxon 2.1 of the License, or (at
-;  your option) any later verdxon.
+;  by the Free Software Foundation; either version 2.1 of the License, or (at
+;  your option) any later version.
 ;  The MPIR Library is distributed in the hope that it will be useful, but
 ;  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 ;  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
@@ -33,76 +33,69 @@
 ;
 ; This is an SEH Frame Function
 
-%include "..\x86_64_asm.inc"
+%include "..\yasm_mac.inc"
 
 %define reg_save_list rbx, rsi, rdi, r12, r13, r14, r15
 
-   bits 64
-   section .text
+    BITS 64
 
-   global   __gmpn_sublsh1_n
+    FRAME_PROC mpn_sublsh1_n, 0, reg_save_list
+    movsxd  rax, r9d
 
-%ifdef DLL
-   export   __gmpn_sublsh1_n
-%endif
+    lea     rsi, [rdx+rax*8]
+    lea     rdx, [r8+rax*8]
+    lea     rdi, [rcx+rax*8]
+    mov     rcx, rax
 
-    prologue __gmpn_sublsh1_n, 0, reg_save_list
-    mov eax, r9d
-
-	lea     rsi, [rdx+rax*8]
-	lea     rdx, [r8+rax*8]
-	lea     rdi, [rcx+rax*8]
-	mov     rcx, rax
-	
-	neg     rcx
-	xor     r9, r9
-	xor     rax, rax
-	test    rcx, 3
-	jz      .2
+    neg     rcx
+    xor     r9, r9
+    xor     rax, rax
+    test    rcx, 3
+    jz      .2
 
 .1: mov     r10, [rsi+rcx*8]
-	add     r9, 1
-	sbb     r10, [rdx+rcx*8]
-	sbb     r9, r9
-	add     rax, 1
-	sbb     r10, [rdx+rcx*8]
-	sbb     rax, rax
-	mov     [rdi+rcx*8], r10
-	add     rcx, 1              ; ***
-	test    rcx, 3
-	jnz     .1
+    add     r9, 1
+    sbb     r10, [rdx+rcx*8]
+    sbb     r9, r9
+    add     rax, 1
+    sbb     r10, [rdx+rcx*8]
+    sbb     rax, rax
+    mov     [rdi+rcx*8], r10
+    add     rcx, 1              ; ***
+    test    rcx, 3
+    jnz     .1
 .2: cmp     rcx, 0
-	jz      .4
+    jz      .4
 
-	alignb  16, nop
+    alignb  16, nop
 .3: mov     r10, [rsi+rcx*8]
-	mov     rbx, [rsi+rcx*8+8]
-	mov     r11, [rsi+rcx*8+16]
-	mov     r8, [rsi+rcx*8+24]
-	mov     r12, [rdx+rcx*8]
-	mov     r13, [rdx+rcx*8+8]
-	mov     r14, [rdx+rcx*8+16]
-	mov     r15, [rdx+rcx*8+24]
-	add     r9, 1
-	sbb     r10, r12
-	sbb     rbx, r13
-	sbb     r11, r14
-	sbb     r8, r15
-	sbb     r9, r9
-	add     rax, 1
-	sbb     r10, r12
-	sbb     rbx, r13
-	sbb     r11, r14
-	sbb     r8, r15
-	sbb     rax, rax
-	mov     [rdi+rcx*8], r10
-	mov     [rdi+rcx*8+8], rbx
-	mov     [rdi+rcx*8+16], r11
-	mov     [rdi+rcx*8+24], r8
-	add     rcx, 4
-	jnz     .3
-.4:	add     rax, r9
-	neg     rax
-	epilogue reg_save_list
-	
-	end
+    mov     rbx, [rsi+rcx*8+8]
+    mov     r11, [rsi+rcx*8+16]
+    mov     r8, [rsi+rcx*8+24]
+    mov     r12, [rdx+rcx*8]
+    mov     r13, [rdx+rcx*8+8]
+    mov     r14, [rdx+rcx*8+16]
+    mov     r15, [rdx+rcx*8+24]
+    add     r9, 1
+    sbb     r10, r12
+    sbb     rbx, r13
+    sbb     r11, r14
+    sbb     r8, r15
+    sbb     r9, r9
+    add     rax, 1
+    sbb     r10, r12
+    sbb     rbx, r13
+    sbb     r11, r14
+    sbb     r8, r15
+    sbb     rax, rax
+    mov     [rdi+rcx*8], r10
+    mov     [rdi+rcx*8+8], rbx
+    mov     [rdi+rcx*8+16], r11
+    mov     [rdi+rcx*8+24], r8
+    add     rcx, 4
+    jnz     .3
+.4: add     rax, r9
+    neg     rax
+    END_PROC reg_save_list
+
+    end

@@ -128,15 +128,15 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/favor:INTEL64"
 				Optimization="3"
-				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="..\..\;&quot;..\$(PlatformName)\&quot;"
 				PreprocessorDefinitions="NDEBUG;_LIB;HAVE_CONFIG_H;PIC"
 				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="0"
 				UsePrecompiledHeader="0"
 				ProgramDataBaseFileName="$(TargetDir)$(TargetName).pdb"
 				WarningLevel="3"
@@ -194,11 +194,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\gmp.h"
+				RelativePath="..\..\longlong.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\longlong.h"
+				RelativePath="..\..\mpir.h"
 				>
 			</File>
 		</Filter>
@@ -3612,15 +3612,15 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\mpn\x86_64w\core2\addmul_1.asm"
+						>
+					</File>
+					<File
 						RelativePath="..\..\mpn\x86_64w\core2\addsub_n.asm"
 						>
 					</File>
 					<File
 						RelativePath="..\..\mpn\x86_64w\core2\aors_n.asm"
-						>
-					</File>
-					<File
-						RelativePath="..\..\mpn\x86_64w\core2\aorsmul_1.asm"
 						>
 					</File>
 					<File
@@ -3672,6 +3672,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\mpn\x86_64w\core2\submul_1.asm"
+						>
+					</File>
+					<File
 						RelativePath="..\..\mpn\x86_64w\core2\sumdiff_n.asm"
 						>
 					</File>
@@ -3683,6 +3687,42 @@
 						RelativePath="..\..\mpn\x86_64w\umul.asm"
 						>
 					</File>
+					<Filter
+						Name="Logic"
+						>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\and_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\andn_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\ior_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\iorn_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\nand_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\nior_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\xnor_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\xor_n.asm"
+							>
+						</File>
+					</Filter>
 				</Filter>
 			</Filter>
 			<Filter

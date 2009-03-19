@@ -1696,15 +1696,15 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\mpn\x86_64w\core2\addmul_1.asm"
+						>
+					</File>
+					<File
 						RelativePath="..\..\mpn\x86_64w\core2\addsub_n.asm"
 						>
 					</File>
 					<File
 						RelativePath="..\..\mpn\x86_64w\core2\aors_n.asm"
-						>
-					</File>
-					<File
-						RelativePath="..\..\mpn\x86_64w\core2\aorsmul_1.asm"
 						>
 					</File>
 					<File
@@ -1756,6 +1756,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\mpn\x86_64w\core2\submul_1.asm"
+						>
+					</File>
+					<File
 						RelativePath="..\..\mpn\x86_64w\core2\sumdiff_n.asm"
 						>
 					</File>
@@ -1767,6 +1771,42 @@
 						RelativePath="..\..\mpn\x86_64w\umul.asm"
 						>
 					</File>
+					<Filter
+						Name="Logic"
+						>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\and_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\andn_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\ior_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\iorn_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\nand_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\nior_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\xnor_n.asm"
+							>
+						</File>
+						<File
+							RelativePath="..\..\mpn\x86_64w\core2\xor_n.asm"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="x64"
@@ -7447,15 +7487,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\gmp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\gmpxx.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\longlong.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\mpir.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\mpirxx.h"
 				>
 			</File>
 			<File

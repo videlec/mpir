@@ -1,10 +1,9 @@
 
-;  AMD64 mpn_add_n/mpn_sub_n -- mpn add or subtract
-;  Version 1.0.3.
+;  Copyright 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 ;
-;  Copyright 2008 Jason Moxham
+;  Copyright 2005, 2006 Pierrick Gaudry
 ;
-;  Windows Conversion Copyright 2008 Brian Gladman
+;  Copyright 2008 Brian Gladman
 ;
 ;  This file is part of the MPIR Library.
 ;  The MPIR Library is free software; you can redistribute it and/or modify
@@ -19,6 +18,8 @@
 ;  along with the MPIR Library; see the file COPYING.LIB.  If not, write
 ;  to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;  Boston, MA 02110-1301, USA.
+;
+;  AMD64 mpn_add_n/mpn_sub_n -- mpn add or subtract.
 ;
 ;  Calling interface:
 ;
@@ -43,100 +44,119 @@
 ;  low limb of the calculation.  Note values other than 1 or 0 here will
 ;  lead to garbage results.
 ;
-;  This is an SEH leaf function (no unwind support needed)
-;
-;   %1 = __g, %2 = adc, %3 = mpn_add_n, %4 = mpn_add_nc
-;   %1 = __g, %2 = sbb, %3 = mpn_sub_n, %4 = mpn_sub_nc
+;  This is an SEH Leaf Function (no unwind support needed)
 
-%macro   mac_sub  4
+%include "..\yasm_mac.inc"
 
-    global  %1%4
-    global  %1%3
+%define dst       rcx   ; destination pointer
+%define sr1       rdx   ; source 1 pointer
+%define sr2        r8   ; source 2 pointer
+%define len        r9   ; number of limbs
+%define cry [rsp+0x28]  ; carry value
 
-%ifdef DLL
-    export  %1%4
-    export  %1%3
+%define r_jmp     r10   ; temporary for jump table entry
+%define r_cnt     r11   ; temporary for loop count
+
+%define UNROLL_LOG2         4
+%define UNROLL_COUNT        (1 << UNROLL_LOG2)
+%define UNROLL_MASK         (UNROLL_COUNT - 1)
+%define UNROLL_BYTES        (8 * UNROLL_COUNT)
+%define UNROLL_THRESHOLD    8
+
+%if UNROLL_BYTES >= 256
+%error unroll count is too large
+%elif UNROLL_BYTES >= 128
+%define off 128
+%else
+%define off 0
 %endif
 
-    alignb  8, nop
-%1%4:
-    mov     r10,[rsp+0x28]
+%macro   mac_sub  3
+
+    LEAF_PROC %3
+    mov     rax,[rsp+0x28]
     jmp     %%0
     
-    alignb  8, nop
-%1%3:
-    xor     r10, r10
-
-%%0:mov     eax, r9d
-    mov	    r9, rax
-    and	    rax, 3
-    shr	    r9, 2
-    lea     r9,[r10+r9*2]
-    shr     r9, 1
-    jnz	    %%2
-
-    mov	    r10, [rdx]
-    %2      r10, [r8]
-    mov	    [rcx], r10
-    dec	    rax
-    jz	    %%1
-    mov	    r10, [rdx+8]
-    %2      r10, [r8+8]
-    mov	    [rcx+8], r10
-    dec	    rax
-    jz	    %%1
-    mov	    r10, [rdx+16]
-    %2      r10, [r8+16]
-    mov	    [rcx+16], r10
-    dec	    rax
-%%1:adc	    rax, rax
+    LEAF_PROC %2
+    xor     rax,rax
+%%0:
+    movsxd  len,r9d
+    cmp     len,UNROLL_THRESHOLD
+    jae     %%2
+    lea     sr1,[sr1+len*8]
+    lea     sr2,[sr2+len*8]
+    lea     dst,[dst+len*8]
+    neg     len
+    shr     rax,1
+%%1:
+    mov     rax,[sr1+len*8]
+    mov     r10,[sr2+len*8]
+    %1      rax,r10
+    mov     [dst+len*8],rax
+    inc     len
+    jnz     %%1
+    mov     rax,dword 0
+    setc    al
     ret
+%%2:
+    mov     r_cnt,1
+    and     r_cnt,len
+    mov     [rsp+0x08], r_cnt
+    and     len,-2
+    mov     r_cnt,len
+    dec     r_cnt
+    shr     r_cnt,UNROLL_LOG2
+    neg     len
+    and     len,UNROLL_MASK
+    lea     r_jmp,[len*4]
+    neg     len
+    lea     sr1,[sr1+len*8+off]
+    lea     sr2,[sr2+len*8+off]
+    lea     dst,[dst+len*8+off]
+    shr     rax,1
+    lea     r_jmp,[r_jmp+r_jmp*2]
+    lea     rax,[rel %%3]
+    lea     r_jmp,[r_jmp+rax]
+    jmp     r_jmp
+%%3:
 
-	alignb  8, nop
-%%2:mov	    r10, [rdx]
-	mov	    r11, [rdx+8]
-	lea	    rdx, [rdx+32]
-	%2	    r10, [r8]
-	%2	    r11, [r8+8]
-	lea	    r8, [r8+32]
-	mov	    [rcx], r10
-	mov	    [rcx+8], r11
-	lea	    rcx, [rcx+32]
-	mov	    r10, [rdx-16]
-	mov	    r11, [rdx-8]
-	%2	    r10, [r8-16]
-	%2	    r11, [r8-8]
-	mov	    [rcx-16], r10
-	dec	    r9
-	mov	    [rcx-8], r11
-	jnz	    %%2
+%define CHUNK_COUNT  2
+%assign i 0
 
-    inc	    rax
-    dec	    rax
-    jz	    %%3
-    mov	    r10, [rdx]
-    %2      r10, [r8]
-    mov	    [rcx], r10
-    dec	    rax
-    jz	    %%3
-    mov	    r10, [rdx+8]
-    %2      r10, [r8+8]
-    mov	    [rcx+8], r10
-    dec	    rax
-    jz	    %%3
-    mov	    r10, [rdx+16]
-    %2      r10, [r8+16]
-    mov	    [rcx+16], r10
-    dec	    rax
-%%3:adc	    rax, rax
+%rep  UNROLL_COUNT / CHUNK_COUNT
+%assign  disp0 8 * i * CHUNK_COUNT - off
+
+    mov     r_jmp,[byte sr1+disp0]      ; len and r_jmp registers
+    mov     len,[byte sr1+disp0+8]      ; now not needed
+    %1      r_jmp,[byte sr2+disp0]
+    mov     [byte dst+disp0],r_jmp
+    %1      len,[byte sr2+disp0+8]
+    mov     [byte dst+disp0+8],len
+
+%assign i i + 1
+%endrep
+
+    dec     r_cnt
+    lea     sr1,[sr1+UNROLL_BYTES]
+    lea     sr2,[sr2+UNROLL_BYTES]
+    lea     dst,[dst+UNROLL_BYTES]
+    jns     %%3
+
+    mov     rax,[rsp+0x08]
+    dec     rax
+    js      %%5
+    mov     len,[sr1-off]
+    %1      len,[sr2-off]
+    mov     [dst-off],len
+%%5:mov     rax,dword 0
+    setc    al
     ret
 
 %endmacro
 
-    bits    64
-    section .text
+    BITS 64
 
-    mac_sub __g,adc,mpn_add_n,mpn_add_nc
-    mac_sub __g,sbb,mpn_sub_n,mpn_sub_nc
+    mac_sub adc,mpn_add_n,mpn_add_nc
+    mac_sub sbb,mpn_sub_n,mpn_sub_nc
 
     end
