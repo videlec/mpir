@@ -35,6 +35,8 @@ dnl  Boston, MA 02110-1301, USA.
 
 
 
+
+
 // set to 1=store or 0=not store
 #define STORE_QUOTIENT 0
 // set to 0=udiv  1=gmp-preinv   2-barrett
@@ -66,6 +68,7 @@ mp_limb_t	mpn_divrem_euclidean_r_1(mp_srcptr xp,mp_size_t n,mp_limb_t d)
 {int j;mp_limb_t r=0,s=0,h,l,q,i;
 
 ASSERT(n>0);ASSERT(d!=0);ASSERT_MPN(xp,n);ASSERT(MPN_SAME_OR_SEPARATE_P(qp,xp,n));
+// for n=1 or n=2 probably faster to to a special case
 #if NORMALIZE==1
 count_leading_zeros(s,d);d=d<<s;
 invert_limb(i,d);

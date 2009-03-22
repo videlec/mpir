@@ -53,6 +53,7 @@ not %rax
 div %r8
 mov %rax,%r9
 xor %rax,%rax
+xor %rbp,%rbp
 ALIGN(16)
 loop:
     mov -8(%rsi,%r14,8),%r13
@@ -97,6 +98,7 @@ pop %r12
 pop %r13
 pop %r14
 pop %r15
+add %rax,%r11
 shr %cl,%r11
 mov %r11,%rax
 ret
