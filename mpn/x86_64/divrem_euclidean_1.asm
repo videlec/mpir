@@ -24,10 +24,8 @@ include(`../config.m4')
 C	(rdi,rdx)=(rsi,rdx) / rcx     #inverse is r8 , no ,calc internel
 C	rax=remainder
 
-C	This is divrem_hensel_1 with shifting on the output of the quotient
-C	On k8/k10 the shifting comes for free so no need to have different
-C	fn for that. And on K8/K10 this runs at 10c/l which is optimal
-C	This function "replaces" divexact_1 and modexact_1_odd
+C	This is divrem_euclidean_1
+C	This function "replaces" divrem_1 mod_1 
 
 ASM_START()
 PROLOGUE(mpn_divrem_euclidean_1)
