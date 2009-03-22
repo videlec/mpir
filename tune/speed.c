@@ -199,6 +199,8 @@ const struct routine_t {
 #if HAVE_NATIVE_mpn_mul_2
   { "mpn_mul_2",         speed_mpn_mul_2,     FLAG_R_OPTIONAL },
 #endif
+  { "mpn_divrem_euclidean_qr_1",      speed_mpn_divrem_euclidean_qr_1,  FLAG_R },
+  { "mpn_divrem_euclidean_r_1",       speed_mpn_divrem_euclidean_r_1,  FLAG_R },
 
   { "mpn_divrem_1",      speed_mpn_divrem_1,  FLAG_R },
   { "mpn_divrem_1f",     speed_mpn_divrem_1f, FLAG_R },

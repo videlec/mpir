@@ -1,6 +1,4 @@
-/*
-
-
+/*   
 
 dnl  Copyright 2009 Jason Moxham
 
@@ -23,6 +21,10 @@ dnl  Boston, MA 02110-1301, USA.
 
 */
 
+#include "mpir.h"
+#include "gmp-impl.h"
+#include "longlong.h"
+
 // d is mormalized
 #define udiv_inverse(i,d)  do{mp_limb_t __X;udiv_qrnnd(i,__X,~(d),GMP_LIMB_MAX,d);}while(0)
 
@@ -36,7 +38,7 @@ dnl  Boston, MA 02110-1301, USA.
 // set to 1=store or 0=not store
 #define STORE_QUOTIENT 1
 // set to 0=udiv  1=gmp-preinv   2-barrett
-#define UDIV_METHOD 0
+#define UDIV_METHOD 1
 
 #if UDIV_NEEDS_NORMALIZATION==1 || UDIV_METHOD==1
 #define NORMALIZE 1
@@ -56,9 +58,11 @@ dnl  Boston, MA 02110-1301, USA.
 #define UDIV	udiv_qrnnd_barrett
 #endif
 
-
-//basic div
-mp_limb_t	mpn_divrem_euclidean_1(mp_ptr qp,mp_srcptr xp,mp_size_t n,mp_limb_t d)
+#if STORE_QUOTIENT
+mp_limb_t	mpn_divrem_euclidean_qr_1(mp_ptr qp,mp_srcptr xp,mp_size_t n,mp_limb_t d)
+#else
+mp_limb_t	mpn_divrem_euclidean_r_1(mp_srcptr xp,mp_size_t n,mp_limb_t d)
+#endif
 {int j;mp_limb_t r=0,s=0,h,l,q,i;
 
 ASSERT(n>0);ASSERT(d!=0);ASSERT_MPN(xp,n);ASSERT(MPN_SAME_OR_SEPARATE_P(qp,xp,n));
@@ -84,7 +88,7 @@ r>>=s;
 return r;}    // so (xp,n) = (qp,n)*d +r   and 0 <= r < d
 
 
-
+/*
 
 int main(void)
 {mp_limb_t  qp[2000],xp[2000],yp[2000],tp[2000],d,m,r1,r2;mp_size_t n,j,k;
@@ -107,29 +111,5 @@ for(n=1;n<100;n+=1)
    }}}
   
 return 0;}
-
-/*
-
-
-mp_limb_t	jaybidivexact(mp_ptr qp,mp_ptr xp,mp_size_t n,mp_limb_t d,mp_limb_t m)
-{int j;mp_limb_t c,h,q,dummy,h1,t,k,hd,ld,qd;
-
-ASSERT(n>0);ASSERT(d!=0);ASSERT_MPN(xp,n);ASSERT(MPN_SAME_OR_SEPARATE_P(qp,xp,n));
-ASSERT(d%2==1);
-// if d is even then either shift the input xp or the output qp
-// output is better as not on depandant path , and for div test dont need to do it
-ASSERT(n%2==0);k=n/2;
-c=0;h=0;t=0;hd=0;
-for(j=0;j<=k-1;j++)
-   {h1=xp[j];ld=xp[n-1-j]
-    if(t>h1){h1=h1-t;c=1;}else{h1=h1-t;c=0;}
-    q=h1*m;
-    udiv_qrnnd(qd,dummy,hd,ld,d);
-    hd=ld-qd*d;
-    qp[n-1-j]=qd;    
-    qp[j]=q;
-    umul_ppmm(h,dummy,q,d);
-    t=h+c;
-  }
-return hd-t;}    //  so (xp,n) = (qp,n)*d +(hd-t)*B^k   and          d divides xp <=>  ret=0
 */
+

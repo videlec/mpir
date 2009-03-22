@@ -176,6 +176,8 @@ double speed_mpn_divexact_1 _PROTO ((struct speed_params *s));
 double speed_mpn_divexact_by3 _PROTO ((struct speed_params *s));
 double speed_mpn_divexact_byff _PROTO ((struct speed_params *s));
 double speed_mpn_divexact_byBm1of _PROTO ((struct speed_params *s));
+double speed_mpn_divrem_euclidean_qr_1 _PROTO ((struct speed_params *s));
+double speed_mpn_divrem_euclidean_r_1 _PROTO ((struct speed_params *s));
 double speed_mpn_divrem_1 _PROTO ((struct speed_params *s));
 double speed_mpn_divrem_1f _PROTO ((struct speed_params *s));
 double speed_mpn_divrem_1c _PROTO ((struct speed_params *s));
