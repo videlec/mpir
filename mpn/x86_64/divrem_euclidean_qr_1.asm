@@ -28,11 +28,12 @@ C	This is divrem_euclidean_1
 C	This function "replaces" divrem_1 mod_1 
 
 ASM_START()
-PROLOGUE(mpn_divrem_euclidean_1)
+PROLOGUE(mpn_divrem_euclidean_qr_1)
 push %r15
 push %r14
 push %r13
 push %r12
+push %rbp
 mov %rdx,%r14
 mov %rcx,%r8
 xor %r15,%r15	
@@ -51,6 +52,7 @@ xor %rax,%rax
 not %rax
 div %r8
 mov %rax,%r9
+xor %rax,%rax
 ALIGN(16)
 loop:
     mov -8(%rsi,%r14,8),%r13
@@ -60,14 +62,17 @@ loop:
     cmovnc %r15,%r13
     shr %cl,%r13
     neg %rcx
-    add %r13,%r11
     shl %cl,%r12
     mov %r12,%r10
-#r10=mask,adj
     sar $63,%r10
-    mov %r11,%rax
+    add %r13,%rax
     sub %r10,%rax
+    add %r11,%rax
+    add %r13,%r11
+    add %rbp,%r11
+#r10=mask,adj
     mul %r9
+    mov %r11,%r13
     and %r8,%r10
     add %r12,%r10
     add %r10,%rax
@@ -77,18 +82,17 @@ loop:
     not %r10
     mov %r8,%rax
     mul %r10
-    mov %r11,%r13
-#r13=t1
     sub %r8,%r13
-    mov %r8,%r11
     add %r12,%rax
+    mov %r8,%r11
     adc %r13,%rdx
     and %rdx,%r11
-    add %rax,%r11
+    mov %rax,%rbp
     sub %r10,%rdx
     mov %rdx,-8(%rdi,%r14,8)
     dec %r14
     jnz loop
+pop %rbp
 pop %r12
 pop %r13
 pop %r14

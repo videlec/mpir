@@ -35,6 +35,8 @@ dnl  Boston, MA 02110-1301, USA.
 
 
 
+
+
 // set to 1=store or 0=not store
 #define STORE_QUOTIENT 1
 // set to 0=udiv  1=gmp-preinv   2-barrett
