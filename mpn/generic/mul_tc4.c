@@ -3,11 +3,11 @@
 
    THIS IS AN INTERNAL FUNCTION WITH A MUTABLE INTERFACE.  IT IS ONLY
    SAFE TO REACH THIS FUNCTION THROUGH DOCUMENTED INTERFACES.
-
+*/
 
 /* Implementation of the Bodrato-Zanoni algorithm for Toom-Cook 4-way.
 
-Copyright 2006 Free Software Foundation, Inc.
+Copyright 2001, 2002, 2004, 2005, 2006 Free Software Foundation, Inc.
 Copyright 2009 William Hart
 
 This file is part of the GNU MP Library.
@@ -26,7 +26,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
-*/
 
 /*
    This implementation is based on that of Paul Zimmmermann, which is available
@@ -35,11 +34,14 @@ MA 02110-1301, USA. */
 
 #include "mpir.h"
 #include "gmp-impl.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #define TC4_THRESHOLD 550 /* must be >= 3 */
 
-void mpn_mul_tc4 (mp_ptr rp, mp_srcptr up,
-		              mp_srcptr vp, mp_size_t n);
+mp_limb_t
+mpn_mul_tc4 (mp_ptr rp, mp_ptr up,
+		          mp_ptr vp, mp_size_t n);
 
 void tc4_add(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, mp_size_t r2n)
 {
@@ -59,133 +61,369 @@ void tc4_add(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, mp_
    } else if (!s2)
    {
       if (rp != r1) MPN_COPY(rp, r1, s1);
-		rn = r1n;
+		*rn = r1n;
    } else if ((r1n ^ r2n) >= 0)
    {
-      rn = r1n;
+      *rn = r1n;
       cy = mpn_add(rp, r1, s1, r2, s2);
       if (cy) 
       {
          rp[s1] = cy;
-         if (rn < 0) rn--;
-         else rn++;
+         if ((*rn) < 0) (*rn)--;
+         else (*rn)++;
       }
    } else
    {
-      if (s1 != s2) cy = CNST_LIMB(1);
-      else cy = (mp_limb_t) MPN_CMP(r1, r2, s1); 
-          
-      if (!cy) rn = 0;
-      else if (cy > CNST_LIMB(0)) 
+      mp_size_t ct;
+		if (s1 != s2) ct = 1;
+		else MPN_CMP(ct, r1, r2, s1); 
+		    
+      if (!ct) *rn = 0;
+      else if (ct > 0) 
       {
          mpn_sub(rp, r1, s1, r2, s2);
-         rn = s1;
-         MPN_NORMALIZE(rp, rn);
-			if (r1 < 0) rn = -rn;
+         *rn = s1;
+         MPN_NORMALIZE(rp, (*rn));
+			if (r1n < 0) *rn = -(*rn);
       }
       else
       {
          mpn_sub_n(rp, r2, r1, s1);
-         rn = s1;
-         MPN_NORMALISE(rp, rn);
-			if (r1 > 0) rn = -rn;
+         *rn = s1;
+         MPN_NORMALIZE(rp, (*rn));
+			if (r1n > 0) *rn = -(*rn);
       }
    }
 }
 
-tc4_add_unsigned(mp_ptr rp, mp_size_t * rn, mp_srcptr up, mp_size_t un, 
-			               mp_srcptr vp, mp_size_t vn)
+inline 
+void tc4_sub(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, mp_size_t r2n)
 {
-	mp_limb_t cy;
-	mp_size_t len;
-		
-	if (un >= vn)
-	{
-		cy = mpn_add(rp, up, un, vp, vn);
-		if (cy) 
-		{
-			rp[un] = cy;
-			len = un + 1;
-		} else
-			len = un;
-		MPN_NORMALIZE(rp, len);
-		*rn = len;
-	} else
-	{
-		cy = mpn_add(rp, vp, vn, up, un);
-		if (cy) 
-		{
-			rp[vn] = cy;
-			len = vn + 1;
-		} else
-			len = vn;
-		MPN_NORMALIZE_NOT_ZERO(rp, len);
-		*rn = len;
-	}
-}
- 
-tc4_sub_unsigned(mp_ptr rp, mp_size_t * rn, mp_srcptr up, mp_size_t un, 
-			               mp_srcptr vp, mp_size_t vn)
-{
-	mp_size_t len;
-		
-	if (un == vn)
-	{
-		int sign;
-		if (un == 0) return 0;
-		MPN_CMP(sign, up, vp, un);
-		if (sign == 0) return 0;
-		if (sign > 0)
-		{
-			mpn_sub_n(rp, up, vp, un);
-			len = un;
-		   MPN_NORMALIZE_NOT_ZERO(rp, len);
-			*rn = len;
-		} else
-		{
-			mpn_sub_n(rp, vp, up, un);
-			len = un;
-		   MPN_NORMALIZE_NOT_ZERO(rp, len);
-			*rn = -len;
-		}
-	} else if (un > vn)
-	{
-		mpn_sub(rp, up, un, vp, vn);
-		len = un;
-		MPN_NORMALIZE_NOT_ZERO(rp, len);
-		*rn = len;
-	} else if (vn > un)
-	{
-		mpn_sub(rp, vp, vn, up, un);
-		len = vn;
-		MPN_NORMALIZE_NOT_ZERO(rp, len);
-		*rn = -len;
-	}
+   tc4_add(rp, rn, r1, r1n, r2, -r2n);
 }
 	
-#define MUL_TC4_UNSIGNED(r3xx, n3xx, r1xx, n1xx, r2xx, n2xx) \
-   do \ 
+void tc4_lshift(mp_ptr rp, mp_size_t * rn, mp_srcptr xp, mp_size_t xn, mp_size_t bits)
+{
+   if (xn == 0) *rn = 0;
+   else
+	{
+		mp_size_t xu = ABS(xn);
+		mp_limb_t msl = mpn_lshift(rp, xp, xu, bits);
+      if (msl) 
+		{
+			rp[xu] = msl;
+			*rn = (xn >= 0 ? xn + 1 : xn - 1);
+		} else
+		   *rn = xn;
+	}
+}
+
+void tc4_rshift_inplace(mp_ptr rp, mp_size_t * rn, mp_size_t bits)
+{
+   if (*rn)
+	{
+		if (*rn > 0) 
+		{
+			mpn_rshift(rp, rp, *rn, bits);
+	      if (rp[(*rn) - 1] == CNST_LIMB(0)) (*rn)--;
+		} else 
+		{
+			mpn_rshift(rp, rp, -(*rn), bits);
+	      if (rp[-(*rn) - 1] == CNST_LIMB(0)) (*rn)++;
+		}
+	}
+}
+
+void tc4_addlsh1_unsigned(mp_ptr rp, mp_size_t * rn, mp_srcptr xp, mp_size_t xn)
+{
+	if (xn)
+	{
+		if (xn >= *rn)
+		{
+			if (xn > *rn) MPN_ZERO(rp + *rn, xn - *rn);
+			mp_limb_t cy = mpn_addlsh1_n(rp, rp, xp, xn);
+			if (cy) 
+			{
+				rp[xn] = cy;
+				*rn = xn + 1;
+			} else *rn = xn;
+		} else
+	   {
+		   mp_limb_t cy = mpn_addlsh1_n(rp, rp, xp, xn);
+	      if (cy) cy = mpn_add_1(rp + xn, rp + xn, *rn - xn, cy);
+		   if (cy) 
+		   {
+			   rp[*rn] = cy;
+			   (*rn)++;
+		   }
+		}
+	}
+}
+
+/*void tc4_divexact_ui(mp_ptr rp, mp_size_t * rn, mp_srcptr x, mp_size_t xn, mp_limb_t c)
+{
+	if (xn)
+	{
+		mp_size_t xu = ABS(xn);
+		mp_limb_t cy = mpn_divmod_1(rp, x, xu, c);
+		if (xn > 0)
+		{
+			if (rp[xu - 1] == 0) *rn = xn - 1;
+			else *rn = xn;
+		} else
+		{
+			if (rp[xu - 1] == 0) *rn = xn + 1;
+			else *rn = xn;
+		}	
+	} else *rn = 0;
+}*/
+
+void tc4_divexact_ui(mp_ptr rp, mp_size_t * rn, mp_ptr x, mp_size_t xn, mp_limb_t c)
+{
+	mpz_t xm, rm;
+   xm->_mp_d = x;
+	xm->_mp_size = xn;
+	rm->_mp_d = rp;
+	rm->_mp_size = *rn;
+	rm->_mp_alloc = ABS(*rn);
+	mpz_divexact_ui(rm, xm, c);
+	*rn = rm->_mp_size;
+}
+
+#if HAVE_NATIVE_mpn_mul_1c
+#define MPN_MUL_1C(cout, dst, src, size, n, cin)        \
+  do {                                                  \
+    (cout) = mpn_mul_1c (dst, src, size, n, cin);       \
+  } while (0)
+#else
+#define MPN_MUL_1C(cout, dst, src, size, n, cin)        \
+  do {                                                  \
+    mp_limb_t __cy;                                     \
+    __cy = mpn_mul_1 (dst, src, size, n);               \
+    (cout) = __cy + mpn_add_1 (dst, dst, size, cin);    \
+  } while (0)
+#endif
+
+void tc4_addmul_1(mp_ptr wp, mp_size_t * wn, mp_srcptr xp, mp_size_t xn, mp_limb_t y)
+{
+  mp_size_t  sign, wu, xu, ws, new_wn, min_size, dsize;
+  mp_limb_t  cy;
+
+  /* w unaffected if x==0 or y==0 */
+  if (xn == 0 || y == 0)
+    return;
+
+  sign = xn;
+  xu = ABS (xn);
+
+  ws = *wn;
+  if (*wn == 0)
+  {
+      /* nothing to add to, just set x*y, "sign" gives the sign */
+      cy = mpn_mul_1 (wp, xp, xu, y);
+      wp[xu] = cy;
+      xu = xu + (cy != 0);
+      *wn = (sign >= 0 ? xu : -xu);
+      return;
+  }
+  
+  sign ^= *wn;
+  wu = ABS (*wn);
+
+  new_wn = MAX (wu, xu);
+  min_size = MIN (wu, xu);
+
+  if (sign >= 0)
+  {
+      /* addmul of absolute values */
+
+      cy = mpn_addmul_1 (wp, xp, min_size, y);
+      
+      dsize = xu - wu;
+#if HAVE_NATIVE_mpn_mul_1c
+      if (dsize > 0)
+        cy = mpn_mul_1c (wp + min_size, xp + min_size, dsize, y, cy);
+      else if (dsize < 0)
+      {
+          dsize = -dsize;
+          cy = mpn_add_1 (wp + min_size, wp + min_size, dsize, cy);
+      }
+#else
+      if (dsize != 0)
+      {
+          mp_limb_t cy2;
+          if (dsize > 0)
+            cy2 = mpn_mul_1 (wp + min_size, xp + min_size, dsize, y);
+          else
+          {
+              dsize = -dsize;
+              cy2 = 0;
+          }
+          cy = cy2 + mpn_add_1 (wp + min_size, wp + min_size, dsize, cy);
+      }
+#endif
+
+      wp[dsize + min_size] = cy;
+      new_wn += (cy != 0);
+   } else
+   {
+      /* submul of absolute values */
+
+      cy = mpn_submul_1 (wp, xp, min_size, y);
+      if (wu >= xu)
+      {
+          /* if w bigger than x, then propagate borrow through it */
+          if (wu != xu)
+            cy = mpn_sub_1 (wp + xu, wp + xu, wu - xu, cy);
+
+          if (cy != 0)
+          {
+              /* Borrow out of w, take twos complement negative to get
+                 absolute value, flip sign of w.  */
+              wp[new_wn] = ~-cy;  /* extra limb is 0-cy */
+              mpn_com_n (wp, wp, new_wn);
+              new_wn++;
+              MPN_INCR_U (wp, new_wn, CNST_LIMB(1));
+              ws = -*wn;
+          }
+      } else /* wu < xu */
+      {
+          /* x bigger than w, so want x*y-w.  Submul has given w-x*y, so
+             take twos complement and use an mpn_mul_1 for the rest.  */
+
+          mp_limb_t  cy2;
+
+          /* -(-cy*b^n + w-x*y) = (cy-1)*b^n + ~(w-x*y) + 1 */
+          mpn_com_n (wp, wp, wu);
+          cy += mpn_add_1 (wp, wp, wu, CNST_LIMB(1));
+          cy -= 1;
+
+          /* If cy-1 == -1 then hold that -1 for latter.  mpn_submul_1 never
+             returns cy==MP_LIMB_T_MAX so that value always indicates a -1. */
+          cy2 = (cy == MP_LIMB_T_MAX);
+          cy += cy2;
+          MPN_MUL_1C (cy, wp + wu, xp + wu, xu - wu, y, cy);
+          wp[new_wn] = cy;
+          new_wn += (cy != 0);
+
+          /* Apply any -1 from above.  The value at wp+wsize is non-zero
+             because y!=0 and the high limb of x will be non-zero.  */
+          if (cy2)
+            MPN_DECR_U (wp+wu, new_wn - wu, CNST_LIMB(1));
+
+          ws = -*wn;
+        }
+
+      /* submul can produce high zero limbs due to cancellation, both when w
+         has more limbs or x has more  */
+      MPN_NORMALIZE (wp, new_wn);
+  }
+
+  *wn = (ws >= 0 ? new_wn : -new_wn);
+
+  ASSERT (new_wn == 0 || wp[new_wn - 1] != 0);
+}
+
+inline
+void tc4_submul_1(mp_ptr wp, mp_size_t * wn, mp_srcptr x, mp_size_t xn, mp_limb_t y)
+{
+	tc4_addmul_1(wp, wn, x, -xn, y);
+}
+
+void tc4_copy (mp_ptr yp, mp_size_t * yn, mp_size_t offset, mp_srcptr xp, mp_size_t xn)
+{
+  mp_size_t yu = ABS(*yn);
+  mp_size_t xu = ABS(xn);
+  mp_limb_t cy = 0;
+
+  if (xn == 0)
+    return;
+
+  if (offset < yu) /* low part of x overlaps with y */
+  {
+      if (offset + xu <= yu) /* x entirely inside y */
+      {
+          cy = mpn_add_n (yp + offset, yp + offset, xp, xu);
+          if (offset + xu < yu)
+            cy = mpn_add_1 (yp + offset + xu, yp + offset + xu,
+                            yu - (offset + xu), cy);
+      } else
+        cy = mpn_add_n (yp + offset, yp + offset, xp, yu - offset);
+      /* now cy is the carry at yp + yu */
+      if (xu + offset > yu) /* high part of x exceeds y */
+      {
+          MPN_COPY (yp + yu, xp + yu - offset, xu + offset - yu);
+          cy = mpn_add_1 (yp + yu, yp + yu, xu + offset - yu, cy);
+          yu = xu + offset;
+      }
+      /* now cy is the carry at yp + yn */
+      if (cy)
+        yp[yu++] = cy;
+      MPN_NORMALIZE(yp, yu);
+      *yn = yu;
+  } else /* x does not overlap */
+  {
+      if (offset > yu)
+        MPN_ZERO (yp + yu, offset - yu);
+      MPN_COPY (yp + offset, xp, xu);
+      *yn = offset + xu;
+  }
+}
+
+#define tc4_mpn_mul_n(r3xx, r1xx, r2xx, n1xx, tempxx) \
+	do \
    { \
-      if (n1xx == n2xx) \
-		{ \
-			if (n1xx > TC4_THRESHOLD) mpn_mul_tc4(r3, r1xx, r2xx, n1xx); \
-			else mpn_mul_n(r3, r1xx, r2xx, n1xx); \
-		} else if (n1xx > n2xx) \
-		   mpn_mul(r3, r1xx, n1xx, r2xx, n2xx); \
-		else \
-		   mpn_mul(r3, r2xx, n2xx, r1xx, n1xx); \
-	   mp_limb_t len = n1xx + n2xx; \
-		MPN_NORMALIZE(r3, len); \
-		n3xx = len; \
+	   if ((r3xx == r1xx) || (r3xx == r2xx)) \
+      { \
+		   mpn_mul_n(tempxx, r1xx, r2xx, n1xx); \
+			MPN_COPY(r3xx, tempxx, 2*n1xx); \
+      } else \
+      { \
+		   mpn_mul_n(r3xx, r1xx, r2xx, n1xx); \
+      } \
    } while (0)
 
-#define MUL_TC4(r3xx, n3xx, r1xx, n1xx, r2xx, n2xx) \
+#define tc4_mpn_mul(r3xx, r1xx, n1xx, r2xx, n2xx, tempxx) \
+	do \
+   { \
+	   if ((r3xx == r1xx) || (r3xx == r2xx)) \
+      { \
+		   mpn_mul(tempxx, r1xx, n1xx, r2xx, n2xx); \
+			MPN_COPY(r3xx, tempxx, n1xx + n2xx); \
+      } else \
+      { \
+		   mpn_mul(r3xx, r1xx, n1xx, r2xx, n2xx); \
+      } \
+   } while (0)
+
+
+#define MUL_TC4_UNSIGNED(r3xx, n3xx, r1xx, n1xx, r2xx, n2xx, tempxx) \
+   do \
+   { \
+      if ((n1xx != 0) && (n2xx != 0)) \
+      { \
+	      if (n1xx == n2xx) \
+		   { \
+			   if (n1xx > TC4_THRESHOLD) mpn_mul_tc4(r3xx, r1xx, r2xx, n1xx); \
+			   else tc4_mpn_mul_n(r3xx, r1xx, r2xx, n1xx, tempxx); \
+		   } else if (n1xx > n2xx) \
+		      tc4_mpn_mul(r3xx, r1xx, n1xx, r2xx, n2xx, tempxx); \
+		   else \
+		      tc4_mpn_mul(r3xx, r2xx, n2xx, r1xx, n1xx, tempxx); \
+	      mp_size_t len = n1xx + n2xx; \
+		   MPN_NORMALIZE(r3xx, len); \
+		   n3xx = len; \
+      } else \
+         n3xx = 0; \
+   } while (0)
+
+#define MUL_TC4(r3xx, n3xx, r1xx, n1xx, r2xx, n2xx, tempxx) \
 	do \
 	{ \
 	   mp_size_t sign = n1xx ^ n2xx; \
 	   mp_size_t un1 = ABS(n1xx); \
 	   mp_size_t un2 = ABS(n2xx); \
-		MUL_TC4(r3xx, n3xx, r1xx, un1, r2xx, un2); \
+		MUL_TC4_UNSIGNED(r3xx, n3xx, r1xx, un1, r2xx, un2, tempxx); \
 		if (sign < 0) n3xx = -n3xx; \
 	} while (0)
 
@@ -193,8 +431,30 @@ tc4_sub_unsigned(mp_ptr rp, mp_size_t * rn, mp_srcptr up, mp_size_t un,
 	do \
 	{ \
 	   nxx = sxx; \
-	   MPN_NORMALISE(rxx, nxx); \
+	   MPN_NORMALIZE(rxx, nxx); \
 	} while(0)
+
+#define p2(axx, anxx, bxx, bnxx) \
+	do \
+	{ \
+	   printf("s1 = "); \
+      if (anxx < 0) printf("-"); \
+      if (anxx == 0) printf("0, "); \
+      else printf("%ld, ", axx[0]); \
+      printf("s2 = "); \
+      if (bnxx < 0) printf("-"); \
+      if (bnxx == 0) printf("0"); \
+      else printf("%ld\n", bxx[0]); \
+   } while (0)
+
+#define p(axx, anxx) \
+	do \
+	{ \
+	   printf("r = "); \
+      if (anxx < 0) printf("-"); \
+      if (anxx == 0) printf("0\n"); \
+      else printf("%ld\n", axx[0]); \
+   } while (0)
 
 /* Multiply {up, n} by {vp, n} and write the result to
    {prodp, 2n}.
@@ -204,8 +464,8 @@ tc4_sub_unsigned(mp_ptr rp, mp_size_t * rn, mp_srcptr up, mp_size_t un,
 */
 
 mp_limb_t
-mpn_mul_tc4 (mp_ptr rp, mp_srcptr up,
-		          mp_srcptr vp, mp_size_t n)
+mpn_mul_tc4 (mp_ptr rp, mp_ptr up,
+		          mp_ptr vp, mp_size_t n)
 {
   ASSERT (n >= 1);
   ASSERT (!MPN_OVERLAP_P(rp, 2*n, up, n));
@@ -214,7 +474,7 @@ mpn_mul_tc4 (mp_ptr rp, mp_srcptr up,
   mp_limb_t cy;
   mp_ptr tp;
   mp_size_t len1, len2, len3, len4, len5, len6, len7;
-  mp_size_t a0n, a1n, a2n, a3n, b0n, b1n, b2n, b3n;
+  mp_size_t a0n, a1n, a2n, a3n, b0n, b1n, b2n, b3n, sn, n1, n2, n3, n4, n5, n6, n7, rpn;
   
   sn = (n - 1) / 4 + 1;
   
@@ -227,18 +487,18 @@ mpn_mul_tc4 (mp_ptr rp, mp_srcptr up,
 #define b2 (vp + 2*sn)
 #define b3 (vp + 3*sn)
 
-   TC_NORM(a0, a0n, sn);
-	TC_NORM(a1, a1n, sn);
-	TC_NORM(a2, a2n, sn);
-	TC_NORM(a3, a3n, n - 3*sn); 
-   TC_NORM(b0, b0n, sn);
-	TC_NORM(b1, b1n, sn);
-	TC_NORM(b2, b2n, sn);
-	TC_NORM(b3, b3n, n - 3*sn); 
+   TC4_NORM(a0, a0n, sn);
+	TC4_NORM(a1, a1n, sn);
+	TC4_NORM(a2, a2n, sn);
+	TC4_NORM(a3, a3n, n - 3*sn); 
+   TC4_NORM(b0, b0n, sn);
+	TC4_NORM(b1, b1n, sn);
+	TC4_NORM(b2, b2n, sn);
+	TC4_NORM(b3, b3n, n - 3*sn); 
 
-#define t4 (2*sn+2) // allows mult of 2 integers of n4 + 1 limbs
+#define t4 (2*sn+2) // allows mult of 2 integers of sn + 1 limbs
 
-   tp = __GMP_ALLOCATE_FUNC_LIMBS(7*t4);
+   tp = __GMP_ALLOCATE_FUNC_LIMBS(8*t4);
 
 #define r1 (tp)
 #define r2 (tp + t4)
@@ -247,6 +507,7 @@ mpn_mul_tc4 (mp_ptr rp, mp_srcptr up,
 #define r5 (tp + 4*t4)
 #define r6 (tp + 5*t4)
 #define r7 (tp + 6*t4)
+#define temp (tp + 7*t4)
 
    tc4_add(r6, &n6, a3, a3n, a1, a1n); 
    tc4_add(r5, &n5, a2, a2n, a0, a0n); 
@@ -257,86 +518,171 @@ mpn_mul_tc4 (mp_ptr rp, mp_srcptr up,
    tc4_add(r7, &n7, r5, n5, r6, n6); 
    tc4_sub(r5, &n5, r5, n5, r6, n6);
    
-	MUL_TC4_UNSIGNED(r3, n3, r3, n3, r7, n7);
-	MUL_TC4(r4, n4, r4, n4, r5, n5);
-
+	MUL_TC4_UNSIGNED(r3, n3, r3, n3, r7, n7, temp);
+	MUL_TC4(r4, n4, r4, n4, r5, n5, temp);
+   
 	tc4_lshift(r1, &n1, a0, a0n, 3);
-	tc4_addlsh1(r1, &n1, a2, a2n);
+	tc4_addlsh1_unsigned(r1, &n1, a2, a2n);
 	tc4_lshift(r7, &n7, a1, a1n, 2);
    tc4_add(r7, &n7, r7, n7, a3, a3n);
    tc4_add(r5, &n5, r1, n1, r7, n7);
-   tc4_add(r6, &n6, r1, n1, r7, n7);
+   tc4_sub(r6, &n6, r1, n1, r7, n7);
    tc4_lshift(r1, &n1, b0, b0n, 3);
-	tc4_addlsh1(r1, &n1, b2, b2n);
+	tc4_addlsh1_unsigned(r1, &n1, b2, b2n);
    tc4_lshift(r7, &n7, b1, b1n, 2);
    tc4_add(r7, &n7, r7, n7, b3, b3n);
    tc4_add(r2, &n2, r1, n1, r7, n7);
    tc4_sub(r7, &n7, r1, n1, r7, n7);
    
-	MUL_TC4_UNSIGNED(r5, n5, r5, n5, r2, n2);
-   MUL_TC4(r6, n6, r6, n6, r7, n7);
-
+	MUL_TC4_UNSIGNED(r5, n5, r5, n5, r2, n2, temp);
+   MUL_TC4(r6, n6, r6, n6, r7, n7, temp);
+   
    tc4_lshift(r2, &n2, a3, a3n, 3);
    tc4_addmul_1(r2, &n2, a2, a2n, 4);
-   tc4_addlsh1(r2, &n2, a1, a1n);
+   tc4_addlsh1_unsigned(r2, &n2, a1, a1n);
 	tc4_add(r2, &n2, r2, n2, a0, a0n);
    tc4_lshift(r7, &n7, b3, b3n, 3);
-   tc4_addmul_1(r7, &n7, b2, b2n, 4);
-   tc4_addlsh1(r7, &n7, b1, b1n);
+	tc4_addmul_1(r7, &n7, b2, b2n, 4);
+   tc4_addlsh1_unsigned(r7, &n7, b1, b1n);
 	tc4_add(r7, &n7, r7, n7, b0, b0n);
-
-	MUL_TC4_UNSIGNED(r2, n2, r2, n2, r7, n7);
-   MUL_TC4_UNSIGNED(r1, n1, a3, a3n, b3, b3n);
-   MUL_TC4_UNSIGNED(r7, n7, a0, a0n, b0, b0n);
-
+   
+	MUL_TC4_UNSIGNED(r2, n2, r2, n2, r7, n7, temp);
+   MUL_TC4_UNSIGNED(r1, n1, a3, a3n, b3, b3n, temp);
+   MUL_TC4_UNSIGNED(r7, n7, a0, a0n, b0, b0n, temp);
+   
 	tc4_add(r2, &n2, r2, n2, r5, n5);
    tc4_sub(r6, &n6, r5, n5, r6, n6);
 	tc4_sub(r4, &n4, r3, n3, r4, n4);
 	
 	tc4_sub(r5, &n5, r5, n5, r1, n1);
 	tc4_submul_1(r5, &n5, r7, n7, 64);
-   tc4_rshift(r4, &n4, r4, n4, 1);
+   tc4_rshift_inplace(r4, &n4, 1);
 	
 	tc4_sub(r3, &n3, r3, n3, r4, n4);
 	tc4_lshift(r5, &n5, r5, n5, 1);
 	tc4_sub(r5, &n5, r5, n5, r6, n6);
-
+   
    tc4_submul_1(r2, &n2, r3, n3, 65);
 	tc4_sub(r3, &n3, r3, n3, r7, n7);
    tc4_sub(r3, &n3, r3, n3, r1, n1);
-
+   
    tc4_addmul_1(r2, &n2, r3, n3, 45);
    tc4_submul_1(r5, &n5, r3, n3, 8);
-
+   
 	tc4_divexact_ui(r5, &n5, r5, n5, 24);
-
+   
 	tc4_sub(r6, &n6, r6, n6, r2, n2);
 	tc4_submul_1(r2, &n2, r4, n4, 16);
-
+   
    tc4_divexact_ui(r2, &n2, r2, n2, 18);
-
+   
    tc4_sub(r3, &n3, r3, n3, r5, n5);
 	tc4_sub(r4, &n4, r4, n4, r2, n2);
 	
 	tc4_divexact_ui(r6, &n6, r6, n6, 30);
-
+   
 	tc4_add(r6, &n6, r6, n6, r2, n2);
-	tc4_rshift(r6, &n6, r6, n6, 1);
-
+	tc4_rshift_inplace(r6, &n6, 1);
+   
 	tc4_sub(r2, &n2, r2, n2, r6, n6);
-
+   
    rpn = 0;
-	tc4_copy(rp, &rpn, 0, r6, n6);
-   tc4_copy(rp, &rpn, n4, r6, n6);
-   tc4_copy(rp, &rpn, 2*n4, r5, n5);
-   tc4_copy(rp, &rpn, 3*n4, r4, n4);
-   tc4_copy(rp, &rpn, 4*n4, r3, n3);
-   tc4_copy(rp, &rpn, 5*n4, r2, n2);
-   tc4_copy(rp, &rpn, 6*n4, r1, n1);
-
+	tc4_copy(rp, &rpn, 0, r7, n7);
+   tc4_copy(rp, &rpn, sn, r6, n6);
+   tc4_copy(rp, &rpn, 2*sn, r5, n5);
+   tc4_copy(rp, &rpn, 3*sn, r4, n4);
+   tc4_copy(rp, &rpn, 4*sn, r3, n3);
+   tc4_copy(rp, &rpn, 5*sn, r2, n2);
+   tc4_copy(rp, &rpn, 6*sn, r1, n1);
+   
 	if (rpn != 2*n) rp[rpn] = 0;
 
-   __GMP_FREE_FUNC_LIMBS (tp, 7*t4);
+   __GMP_FREE_FUNC_LIMBS (tp, 8*t4);
 
 	return rp[2*n - 1];
+}
+
+int tc4_test(mp_ptr up, mp_ptr vp, mp_size_t n)
+{
+	mp_limb_t * rp1 = malloc(2*n*sizeof(mp_limb_t));
+   mp_limb_t * rp2 = malloc(2*n*sizeof(mp_limb_t));
+
+	mpn_mul_n(rp1, up, vp, n);
+   mpn_mul_tc4(rp2, up, vp, n);
+
+	mp_size_t i;
+	for (i = 0; i < 2*n; i++)
+	{
+		if (rp1[i] != rp2[i]) 
+		{
+			printf("First error in limb %d\n", i);
+			free(rp1);
+	      free(rp2);
+	      return 0;
+		}
+	}
+	
+	free(rp1);
+	free(rp2);
+	return 1;
+}
+
+mp_size_t randsize(mp_size_t limit) 
+{
+    static uint64_t randval = 4035456057U;
+    randval = ((uint64_t)randval*(uint64_t)1025416097U+(uint64_t)286824430U)%(uint64_t)4294967311U;
+    
+    if (limit == 0L) return (mp_size_t) randval;
+    
+    return (mp_size_t) randval%limit;
+}
+
+/*int main(void)
+{
+   mp_limb_t * up = malloc(2000*sizeof(mp_limb_t));
+   mp_limb_t * vp = malloc(2000*sizeof(mp_limb_t));
+   
+	mp_size_t i, n;
+   for (i = 0; i < 20000; i++)
+	{
+	   n = randsize(1500) + 500;
+		printf("n = %d\n", n);
+		mpn_random2(up, n);
+		mpn_random2(vp, n);
+      if (!tc4_test(up, vp, n)) break;
+	}
+
+	free(up);
+	free(vp);
+   free(rp);
+
+	return 0;
+}*/
+
+int main(void)
+{
+   mp_limb_t * up = malloc(4096*sizeof(mp_limb_t));
+   mp_limb_t * vp = malloc(4096*sizeof(mp_limb_t));
+   mp_limb_t * rp = malloc(8192*sizeof(mp_limb_t));
+
+	mp_size_t i, n;
+   n = 4096;
+	mpn_random(up, n);
+	mpn_random(vp, n);
+   for (i = 0; i < 5000; i++)
+	{
+	   if ((i & 31) == 0)
+		{
+			mpn_random(up, n);
+	      mpn_random(vp, n);
+		}
+		//mpn_mul_n(rp, up, vp, n);
+		mpn_mul_tc4(rp, up, vp, n);
+	}
+
+	free(up);
+	free(vp);
+   free(rp);
+
+	return 0;
 }
