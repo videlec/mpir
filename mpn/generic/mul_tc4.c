@@ -190,6 +190,24 @@ void tc4_divexact_ui(mp_ptr rp, mp_size_t * rn, mp_ptr x, mp_size_t xn, mp_limb_
 	*rn = rm->_mp_size;
 }
 
+void tc4_divexact_by3(mp_ptr rp, mp_size_t * rn, mp_ptr x, mp_size_t xn)
+{
+	if (xn)
+	{
+		mp_size_t xu = ABS(xn);
+		mp_limb_t cy = mpn_divexact_by3(rp, x, xu);
+		if (xn > 0)
+		{
+			if (rp[xu - 1] == 0) *rn = xn - 1;
+			else *rn = xn;
+		} else
+		{
+			if (rp[xu - 1] == 0) *rn = xn + 1;
+			else *rn = xn;
+		}	
+	} else *rn = 0;
+}
+
 #if HAVE_NATIVE_mpn_mul_1c
 #define MPN_MUL_1C(cout, dst, src, size, n, cin)        \
   do {                                                  \
@@ -569,13 +587,18 @@ mpn_mul_tc4 (mp_ptr rp, mp_ptr up,
    tc4_addmul_1(r2, &n2, r3, n3, 45);
    tc4_submul_1(r5, &n5, r3, n3, 8);
    
-	tc4_divexact_ui(r5, &n5, r5, n5, 24);
-   
+	//tc4_divexact_ui(r5, &n5, r5, n5, 24);
+   tc4_divexact_by3(r5, &n5, r5, n5);
+   tc4_rshift_inplace(r5, &n5, 2);
+	
 	tc4_sub(r6, &n6, r6, n6, r2, n2);
 	tc4_submul_1(r2, &n2, r4, n4, 16);
    
-   tc4_divexact_ui(r2, &n2, r2, n2, 18);
-   
+   //tc4_divexact_ui(r2, &n2, r2, n2, 18);
+   tc4_divexact_by3(r2, &n2, r2, n2);
+   tc4_divexact_by3(r2, &n2, r2, n2);
+   tc4_rshift_inplace(r2, &n2, 1);
+	
    tc4_sub(r3, &n3, r3, n3, r5, n5);
 	tc4_sub(r4, &n4, r4, n4, r2, n2);
 	
@@ -666,10 +689,10 @@ int main(void)
    mp_limb_t * rp = malloc(8192*sizeof(mp_limb_t));
 
 	mp_size_t i, n;
-   n = 4096;
+   n = 2048;
 	mpn_random(up, n);
 	mpn_random(vp, n);
-   for (i = 0; i < 5000; i++)
+   for (i = 0; i < 50000; i++)
 	{
 	   if ((i & 31) == 0)
 		{
