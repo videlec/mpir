@@ -41,16 +41,18 @@ main (void)
 
   for (xn = 1; xn < 30; xn++)
     {
-      for (yn = 1; yn < 30; yn++)
+      for (yn = 1; yn <= xn; yn++)
 	{
 	  for (c = 0; c < 10; c++)
 	    {
 	      mpn_random (xp, xn);
 	      mpn_random (yp, yn);
 	      mpn_random (r1p, xn + yn);
+	      //DISP(xp,xn);DISP(yp,yn);DISP(r1p,xn+yn);
 	      mpn_mul_basecase (r2p, xp, xn, yp, yn);
 	      r2 = mpn_add_n (r2p, r1p, r2p, xn + yn);
 	      r1 = mpn_addmul_basecase (r1p, xp, xn, yp, yn);
+	      //DISP(r2p,xn+yn);DISP(r1p,xn+yn);
 	      if (r1 != r2 || mpn_cmp (r1p, r2p, xn + yn) != 0)
 		{
 		  printf ("mpn_addmul_basecase error\n");

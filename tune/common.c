@@ -902,6 +902,11 @@ speed_mpn_mul_basecase (struct speed_params *s)
   SPEED_ROUTINE_MPN_MUL_BASECASE(mpn_mul_basecase);
 }
 double
+speed_mpn_addmul_basecase (struct speed_params *s)
+{
+  SPEED_ROUTINE_MPN_MUL_BASECASE(mpn_addmul_basecase);
+}
+double
 speed_mpn_sqr_basecase (struct speed_params *s)
 {
   /* FIXME: size restrictions on some versions of sqr_basecase */

@@ -291,6 +291,7 @@ const struct routine_t {
   { "mpn_jacobi_base_3", speed_mpn_jacobi_base_3    },
 
   { "mpn_mul_basecase",  speed_mpn_mul_basecase, FLAG_R_OPTIONAL },
+  { "mpn_addmul_basecase",speed_mpn_addmul_basecase, FLAG_R_OPTIONAL },
   { "mpn_sqr_basecase",  speed_mpn_sqr_basecase     },
 #if HAVE_NATIVE_mpn_sqr_diagonal
   { "mpn_sqr_diagonal",  speed_mpn_sqr_diagonal     },

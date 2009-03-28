@@ -1,6 +1,7 @@
 
 added new functions		addmul_basecase 		submul_basecase
-added to tests
+				addmul_basecase in x86_64 asm
+added to tests,speed
 not added to fat structure
 not added to try
-not added to speed
+added temp file x86-asm.def.m4
