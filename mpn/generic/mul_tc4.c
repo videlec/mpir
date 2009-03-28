@@ -322,6 +322,87 @@ void tc4_sumdiff_unsigned(mp_ptr rp, mp_size_t * rn, mp_ptr sp, mp_size_t * sn, 
    }
 }
 
+void tc4_addadd(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, mp_size_t r2n, mp_ptr r3, mp_size_t r3n)
+{
+	if ((ABS(r1n) != ABS(r2n)) || (ABS(r1n) != ABS(r3n)))
+	{
+		tc4_add(rp, rn, r1, r1n, r2, r2n);
+		tc4_add(rp, rn, rp, *rn, r3, r3n);
+	} else
+	{
+      mp_limb_t cy;
+		mp_size_t sn = ABS(r1n);
+		if (((r1n ^ r2n) >= 0) && ((r1n ^ r3n) >= 0)) // all same sign addadd
+		{
+         cy = mpn_addadd_n(rp, r1, r2, r3, sn);
+			*rn = r1n;
+			if (cy) 
+         {
+            rp[sn] = cy;
+            if ((*rn) < 0) (*rn)--;
+            else (*rn)++;
+         }
+		} else if (((r1n ^ r2n) >= 0) && ((r1n ^ r3n) < 0)) // addsub
+		{
+			cy = mpn_addsub_n(rp, r1, r2, r3, sn);
+			*rn = r1n;
+			if (cy > CNST_LIMB(0)) 
+			{
+				rp[sn] = cy;
+            if ((*rn) < 0) (*rn)--;
+            else (*rn)++;
+			} else if (cy < CNST_LIMB(0))
+			{
+				mpn_com_n(rp, rp, sn);
+				mpn_add_1(rp, rp, sn, CNST_LIMB(1));
+				*rn = -(*rn);
+			}
+		} else if (((r1n ^ r2n) < 0) && ((r1n ^ r3n) >= 0)) // subadd
+		{
+			cy = mpn_addsub_n(rp, r1, r3, r2, sn);
+			*rn = r1n;
+			if (cy > CNST_LIMB(0)) 
+			{
+				rp[sn] = cy;
+            if ((*rn) < 0) (*rn)--;
+            else (*rn)++;
+			} else if (cy < CNST_LIMB(0))
+			{
+				mpn_com_n(rp, rp, sn);
+				mpn_add_1(rp, rp, sn, CNST_LIMB(1));
+				*rn = -(*rn);
+			}
+		} else // add final two and subtract first  
+		{
+			cy = mpn_addsub_n(rp, r2, r3, r1, sn);
+			*rn = -r1n;
+			if (cy < CNST_LIMB(0)) 
+			{
+				rp[sn] = -cy;
+            if ((*rn) < 0) (*rn)--;
+            else (*rn)++;
+			} else if (cy > CNST_LIMB(0))
+			{
+				mpn_com_n(rp, rp, sn);
+				mpn_add_1(rp, rp, sn, CNST_LIMB(1));
+				*rn = -(*rn);
+			}
+		}
+	}
+}
+
+inline
+void tc4_addsub(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, mp_size_t r2n, mp_ptr r3, mp_size_t r3n)
+{
+	tc4_addadd(rp, rn, r1, r1n, r2, r2n, r3, -r3n);
+}
+
+inline
+void tc4_subsub(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, mp_size_t r2n, mp_ptr r3, mp_size_t r3n)
+{
+	tc4_addadd(rp, rn, r1, r1n, r2, -r2n, r3, -r3n);
+}
+
 void tc4_add_unsigned(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, mp_size_t r2n)
 {
    mp_limb_t cy;
@@ -838,13 +919,15 @@ mpn_mul_tc4 (mp_ptr rp, mp_ptr up,
    tc4_rshift_inplace(r4, &n4, 1);
 	
 	tc4_sub(r3, &n3, r3, n3, r4, n4);
-	tc4_lshift(r5, &n5, r5, n5, 1); //###############
-	tc4_sub(r5, &n5, r5, n5, r6, n6);
-   
+	//tc4_lshift(r5, &n5, r5, n5, 1); //###############  
+	//tc4_sub(r5, &n5, r5, n5, r6, n6);
+   tc4_addsub(r5, &n5, r5, n5, r5, n5, r6, n6);
+
    tc4_submul_1(r2, &n2, r3, n3, 65);
-	tc4_sub(r3, &n3, r3, n3, r7, n7); //################
-   tc4_sub(r3, &n3, r3, n3, r1, n1);
-   
+	//tc4_sub(r3, &n3, r3, n3, r7, n7); //################ 
+   //tc4_sub(r3, &n3, r3, n3, r1, n1);
+   tc4_subsub(r3, &n3, r3, n3, r7, n7, r1, n1);
+
    tc4_addmul_1(r2, &n2, r3, n3, 45);
    tc4_submul_1(r5, &n5, r3, n3, 8);
    
@@ -944,9 +1027,9 @@ mp_size_t randsize(mp_size_t limit)
 
 int main(void)
 {
-   mp_limb_t * up = malloc(4096*sizeof(mp_limb_t));
-   mp_limb_t * vp = malloc(4096*sizeof(mp_limb_t));
-   mp_limb_t * rp = malloc(8192*sizeof(mp_limb_t));
+   mp_limb_t * up = malloc(40096*sizeof(mp_limb_t));
+   mp_limb_t * vp = malloc(40096*sizeof(mp_limb_t));
+   mp_limb_t * rp = malloc(80192*sizeof(mp_limb_t));
 
 	mp_size_t i, n;
    n = 2048;
