@@ -274,7 +274,7 @@ OFILES = @mpn_objects@
 nodist_EXTRA_libmpn_la_SOURCES = \
   add.c add_1.c add_n.c addadd_n.c addsub_n.c				    \
   addmul_1.c addmul_2.c addmul_3.c addmul_4.c addmul_5.c addmul_6.c	    \
-  addmul_7.c addmul_8.c							    \
+  addmul_7.c addmul_8.c	addmul_basecase.c				    \
   and_n.c andn_n.c bdivmod.c						    \
   cmp.c com_n.c copyd.c copyi.c						    \
   dc_divrem_n.c dive_1.c diveby3.c divebyff.c divis.c divrem.c divrem_1.c	\
@@ -289,7 +289,7 @@ nodist_EXTRA_libmpn_la_SOURCES = \
   pre_divrem_1.c pre_mod_1.c pow_1.c random.c random2.c rshift.c   \
   rootrem.c redc_basecase.c sb_divrem_mn.c scan0.c scan1.c set_str.c	    \
   sqr_basecase.c sqr_diagonal.c						    \
-  sqrtrem.c sub.c sub_1.c sub_n.c submul_1.c				    \
+  sqrtrem.c sub.c sub_1.c sub_n.c submul_1.c submul_basecase.c		    \
   tdiv_qr.c udiv_qrnnd.c udiv_w_sdiv.c xor_n.c xnor_n.c
 
 noinst_LTLIBRARIES = libmpn.la
@@ -416,6 +416,8 @@ addmul_7_.c: addmul_7.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/addmul_7.c; then echo $(srcdir)/addmul_7.c; else echo addmul_7.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 addmul_8_.c: addmul_8.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/addmul_8.c; then echo $(srcdir)/addmul_8.c; else echo addmul_8.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
+addmul_basecase_.c: addmul_basecase.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/addmul_basecase.c; then echo $(srcdir)/addmul_basecase.c; else echo addmul_basecase.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 addsub_n_.c: addsub_n.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/addsub_n.c; then echo $(srcdir)/addsub_n.c; else echo addsub_n.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 and_n_.c: and_n.c $(ANSI2KNR)
@@ -572,6 +574,8 @@ sub_n_.c: sub_n.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/sub_n.c; then echo $(srcdir)/sub_n.c; else echo sub_n.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 submul_1_.c: submul_1.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/submul_1.c; then echo $(srcdir)/submul_1.c; else echo submul_1.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
+submul_basecase_.c: submul_basecase.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/submul_basecase.c; then echo $(srcdir)/submul_basecase.c; else echo submul_basecase.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 tdiv_qr_.c: tdiv_qr.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/tdiv_qr.c; then echo $(srcdir)/tdiv_qr.c; else echo tdiv_qr.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 udiv_qrnnd_.c: udiv_qrnnd.c $(ANSI2KNR)
@@ -587,7 +591,8 @@ add_n_.lo addadd_n_.$(OBJEXT) addadd_n_.lo addmul_1_.$(OBJEXT) \
 addmul_1_.lo addmul_2_.$(OBJEXT) addmul_2_.lo addmul_3_.$(OBJEXT) \
 addmul_3_.lo addmul_4_.$(OBJEXT) addmul_4_.lo addmul_5_.$(OBJEXT) \
 addmul_5_.lo addmul_6_.$(OBJEXT) addmul_6_.lo addmul_7_.$(OBJEXT) \
-addmul_7_.lo addmul_8_.$(OBJEXT) addmul_8_.lo addsub_n_.$(OBJEXT) \
+addmul_7_.lo addmul_8_.$(OBJEXT) addmul_8_.lo \
+addmul_basecase_.$(OBJEXT) addmul_basecase_.lo addsub_n_.$(OBJEXT) \
 addsub_n_.lo and_n_.$(OBJEXT) and_n_.lo andn_n_.$(OBJEXT) andn_n_.lo \
 bdivmod_.$(OBJEXT) bdivmod_.lo bgcd_.$(OBJEXT) bgcd_.lo cmp_.$(OBJEXT) \
 cmp_.lo com_n_.$(OBJEXT) com_n_.lo copyd_.$(OBJEXT) copyd_.lo \
@@ -625,7 +630,8 @@ set_str_.$(OBJEXT) set_str_.lo sgcd_.$(OBJEXT) sgcd_.lo \
 sqr_basecase_.$(OBJEXT) sqr_basecase_.lo sqr_diagonal_.$(OBJEXT) \
 sqr_diagonal_.lo sqrtrem_.$(OBJEXT) sqrtrem_.lo sub_.$(OBJEXT) sub_.lo \
 sub_1_.$(OBJEXT) sub_1_.lo sub_n_.$(OBJEXT) sub_n_.lo \
-submul_1_.$(OBJEXT) submul_1_.lo tdiv_qr_.$(OBJEXT) tdiv_qr_.lo \
+submul_1_.$(OBJEXT) submul_1_.lo submul_basecase_.$(OBJEXT) \
+submul_basecase_.lo tdiv_qr_.$(OBJEXT) tdiv_qr_.lo \
 udiv_qrnnd_.$(OBJEXT) udiv_qrnnd_.lo udiv_w_sdiv_.$(OBJEXT) \
 udiv_w_sdiv_.lo xnor_n_.$(OBJEXT) xnor_n_.lo xor_n_.$(OBJEXT) \
 xor_n_.lo : $(ANSI2KNR)

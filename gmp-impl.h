@@ -883,6 +883,12 @@ mp_limb_t mpn_mul_2 _PROTO ((mp_ptr, mp_srcptr, mp_size_t, mp_srcptr));
 __GMP_DECLSPEC void mpn_mul_basecase __GMP_PROTO ((mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t));
 #endif
 
+#define mpn_addmul_basecase __MPN(addmul_basecase)
+__GMP_DECLSPEC mp_limb_t mpn_addmul_basecase __GMP_PROTO ((mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t));
+
+#define mpn_submul_basecase __MPN(submul_basecase)
+__GMP_DECLSPEC mp_limb_t mpn_submul_basecase __GMP_PROTO ((mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t));
+
 #define mpn_mullow_n __MPN(mullow_n)
 __GMP_DECLSPEC void mpn_mullow_n __GMP_PROTO ((mp_ptr, mp_srcptr, mp_srcptr, mp_size_t));
 

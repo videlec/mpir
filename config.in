@@ -224,6 +224,7 @@ MA 02110-1301, USA.
 #undef HAVE_NATIVE_mpn_addmul_6
 #undef HAVE_NATIVE_mpn_addmul_7
 #undef HAVE_NATIVE_mpn_addmul_8
+#undef HAVE_NATIVE_mpn_addmul_basecase
 #undef HAVE_NATIVE_mpn_addsub_n
 #undef HAVE_NATIVE_mpn_sumdiff_n
 #undef HAVE_NATIVE_mpn_and_n
@@ -265,6 +266,7 @@ MA 02110-1301, USA.
 #undef HAVE_NATIVE_mpn_sub_nc
 #undef HAVE_NATIVE_mpn_sublsh1_n
 #undef HAVE_NATIVE_mpn_submul_1c
+#undef HAVE_NATIVE_mpn_submul_basecase
 #undef HAVE_NATIVE_mpn_umul_ppmm
 #undef HAVE_NATIVE_mpn_umul_ppmm_r
 #undef HAVE_NATIVE_mpn_udiv_qrnnd

@@ -35,7 +35,7 @@ OFILES = @mpn_objects@
 nodist_EXTRA_libmpn_la_SOURCES =					    \
   add.c add_1.c add_n.c addadd_n.c addsub_n.c				    \
   addmul_1.c addmul_2.c addmul_3.c addmul_4.c addmul_5.c addmul_6.c	    \
-  addmul_7.c addmul_8.c							    \
+  addmul_7.c addmul_8.c	addmul_basecase.c				    \
   and_n.c andn_n.c bdivmod.c						    \
   cmp.c com_n.c copyd.c copyi.c						    \
   dc_divrem_n.c dive_1.c diveby3.c divebyff.c divis.c divrem.c divrem_1.c	\
@@ -50,7 +50,7 @@ nodist_EXTRA_libmpn_la_SOURCES =					    \
   pre_divrem_1.c pre_mod_1.c pow_1.c random.c random2.c rshift.c   \
   rootrem.c redc_basecase.c sb_divrem_mn.c scan0.c scan1.c set_str.c	    \
   sqr_basecase.c sqr_diagonal.c						    \
-  sqrtrem.c sub.c sub_1.c sub_n.c submul_1.c				    \
+  sqrtrem.c sub.c sub_1.c sub_n.c submul_1.c submul_basecase.c		    \
   tdiv_qr.c udiv_qrnnd.c udiv_w_sdiv.c xor_n.c xnor_n.c
 
 noinst_LTLIBRARIES = libmpn.la

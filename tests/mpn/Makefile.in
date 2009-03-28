@@ -56,7 +56,7 @@ check_PROGRAMS = t-asmtype$(EXEEXT) t-aors_1$(EXEEXT) \
 	t-instrument$(EXEEXT) t-iord_u$(EXEEXT) t-mp_bases$(EXEEXT) \
 	t-perfsqr$(EXEEXT) t-scan$(EXEEXT) t-lorrshift1$(EXEEXT) \
 	t-divebyff$(EXEEXT) t-addadd_n$(EXEEXT) t-addsub_n$(EXEEXT) \
-	t-redc_basecase$(EXEEXT)
+	t-redc_basecase$(EXEEXT) t-aorsmul_basecase$(EXEEXT)
 subdir = tests/mpn
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -81,6 +81,11 @@ t_aors_1_SOURCES = t-aors_1.c
 t_aors_1_OBJECTS = t-aors_1$U.$(OBJEXT)
 t_aors_1_LDADD = $(LDADD)
 t_aors_1_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
+	$(top_builddir)/libmpir.la
+t_aorsmul_basecase_SOURCES = t-aorsmul_basecase.c
+t_aorsmul_basecase_OBJECTS = t-aorsmul_basecase$U.$(OBJEXT)
+t_aorsmul_basecase_LDADD = $(LDADD)
+t_aorsmul_basecase_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
 	$(top_builddir)/libmpir.la
 t_asmtype_SOURCES = t-asmtype.c
 t_asmtype_OBJECTS = t-asmtype$U.$(OBJEXT)
@@ -154,14 +159,14 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = t-addadd_n.c t-addsub_n.c t-aors_1.c t-asmtype.c \
-	t-divebyff.c t-divrem_1.c t-fat.c t-get_d.c t-instrument.c \
-	t-iord_u.c t-lorrshift1.c t-mp_bases.c t-perfsqr.c \
-	t-redc_basecase.c t-scan.c
-DIST_SOURCES = t-addadd_n.c t-addsub_n.c t-aors_1.c t-asmtype.c \
-	t-divebyff.c t-divrem_1.c t-fat.c t-get_d.c t-instrument.c \
-	t-iord_u.c t-lorrshift1.c t-mp_bases.c t-perfsqr.c \
-	t-redc_basecase.c t-scan.c
+SOURCES = t-addadd_n.c t-addsub_n.c t-aors_1.c t-aorsmul_basecase.c \
+	t-asmtype.c t-divebyff.c t-divrem_1.c t-fat.c t-get_d.c \
+	t-instrument.c t-iord_u.c t-lorrshift1.c t-mp_bases.c \
+	t-perfsqr.c t-redc_basecase.c t-scan.c
+DIST_SOURCES = t-addadd_n.c t-addsub_n.c t-aors_1.c \
+	t-aorsmul_basecase.c t-asmtype.c t-divebyff.c t-divrem_1.c \
+	t-fat.c t-get_d.c t-instrument.c t-iord_u.c t-lorrshift1.c \
+	t-mp_bases.c t-perfsqr.c t-redc_basecase.c t-scan.c
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -370,6 +375,9 @@ t-addsub_n$(EXEEXT): $(t_addsub_n_OBJECTS) $(t_addsub_n_DEPENDENCIES)
 t-aors_1$(EXEEXT): $(t_aors_1_OBJECTS) $(t_aors_1_DEPENDENCIES) 
 	@rm -f t-aors_1$(EXEEXT)
 	$(LINK) $(t_aors_1_OBJECTS) $(t_aors_1_LDADD) $(LIBS)
+t-aorsmul_basecase$(EXEEXT): $(t_aorsmul_basecase_OBJECTS) $(t_aorsmul_basecase_DEPENDENCIES) 
+	@rm -f t-aorsmul_basecase$(EXEEXT)
+	$(LINK) $(t_aorsmul_basecase_OBJECTS) $(t_aorsmul_basecase_LDADD) $(LIBS)
 t-asmtype$(EXEEXT): $(t_asmtype_OBJECTS) $(t_asmtype_DEPENDENCIES) 
 	@rm -f t-asmtype$(EXEEXT)
 	$(LINK) $(t_asmtype_OBJECTS) $(t_asmtype_LDADD) $(LIBS)
@@ -432,6 +440,8 @@ t-addsub_n_.c: t-addsub_n.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/t-addsub_n.c; then echo $(srcdir)/t-addsub_n.c; else echo t-addsub_n.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 t-aors_1_.c: t-aors_1.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/t-aors_1.c; then echo $(srcdir)/t-aors_1.c; else echo t-aors_1.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
+t-aorsmul_basecase_.c: t-aorsmul_basecase.c $(ANSI2KNR)
+	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/t-aorsmul_basecase.c; then echo $(srcdir)/t-aorsmul_basecase.c; else echo t-aorsmul_basecase.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 t-asmtype_.c: t-asmtype.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/t-asmtype.c; then echo $(srcdir)/t-asmtype.c; else echo t-asmtype.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 t-divebyff_.c: t-divebyff.c $(ANSI2KNR)
@@ -457,10 +467,11 @@ t-redc_basecase_.c: t-redc_basecase.c $(ANSI2KNR)
 t-scan_.c: t-scan.c $(ANSI2KNR)
 	$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) `if test -f $(srcdir)/t-scan.c; then echo $(srcdir)/t-scan.c; else echo t-scan.c; fi` | sed 's/^# \([0-9]\)/#line \1/' | $(ANSI2KNR) > $@ || rm -f $@
 t-addadd_n_.$(OBJEXT) t-addadd_n_.lo t-addsub_n_.$(OBJEXT) \
-t-addsub_n_.lo t-aors_1_.$(OBJEXT) t-aors_1_.lo t-asmtype_.$(OBJEXT) \
-t-asmtype_.lo t-divebyff_.$(OBJEXT) t-divebyff_.lo \
-t-divrem_1_.$(OBJEXT) t-divrem_1_.lo t-fat_.$(OBJEXT) t-fat_.lo \
-t-get_d_.$(OBJEXT) t-get_d_.lo t-instrument_.$(OBJEXT) \
+t-addsub_n_.lo t-aors_1_.$(OBJEXT) t-aors_1_.lo \
+t-aorsmul_basecase_.$(OBJEXT) t-aorsmul_basecase_.lo \
+t-asmtype_.$(OBJEXT) t-asmtype_.lo t-divebyff_.$(OBJEXT) \
+t-divebyff_.lo t-divrem_1_.$(OBJEXT) t-divrem_1_.lo t-fat_.$(OBJEXT) \
+t-fat_.lo t-get_d_.$(OBJEXT) t-get_d_.lo t-instrument_.$(OBJEXT) \
 t-instrument_.lo t-iord_u_.$(OBJEXT) t-iord_u_.lo \
 t-lorrshift1_.$(OBJEXT) t-lorrshift1_.lo t-mp_bases_.$(OBJEXT) \
 t-mp_bases_.lo t-perfsqr_.$(OBJEXT) t-perfsqr_.lo \
