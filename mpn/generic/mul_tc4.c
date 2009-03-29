@@ -34,6 +34,7 @@ MA 02110-1301, USA. */
 
 #include "mpir.h"
 #include "gmp-impl.h"
+#include "longlong.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -322,70 +323,117 @@ void tc4_sumdiff_unsigned(mp_ptr rp, mp_size_t * rn, mp_ptr sp, mp_size_t * sn, 
    }
 }
 
+/* ~~~~~~~~~~~~~~~~~~~~UNTESTED CODE~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#define MPN_ADDSUB_CMP(cyxx, r1xx, r2xx, r3xx, snxx) \
+	do { \
+	   mp_limb_t t[2]; \
+		add_ssaaaa(t[1], t[0], CNST_LIMB(0), r1xx[snxx - 1], CNST_LIMB(0), r2xx[snxx - 1]); \
+      if (t[1]) cyxx = 1; \
+	   else if (t[0] > r3xx[snxx - 1]) cyxx = 1; \
+		else if (t[0] < r3xx[snxx - 1] - CNST_LIMB(1)) cyxx = -1; \
+		else cyxx = 0; \
+	} while (0)
+
 void tc4_addadd(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, mp_size_t r2n, mp_ptr r3, mp_size_t r3n)
 {
-	if ((ABS(r1n) != ABS(r2n)) || (ABS(r1n) != ABS(r3n)))
+	mp_size_t s1 = ABS(r1n);
+	mp_size_t s2 = ABS(r2n);
+	mp_size_t s3 = ABS(r3n);
+
+	if ((s1 != s2) || (s1 != s3))
 	{
-		tc4_add(rp, rn, r1, r1n, r2, r2n);
-		tc4_add(rp, rn, rp, *rn, r3, r3n);
+			tc4_add(rp, rn, r1, r1n, r2, r2n);
+		   tc4_add(rp, rn, rp, *rn, r3, r3n);
 	} else
 	{
       mp_limb_t cy;
-		mp_size_t sn = ABS(r1n);
+		mp_size_t cy2;
 		if (((r1n ^ r2n) >= 0) && ((r1n ^ r3n) >= 0)) // all same sign addadd
 		{
-         cy = mpn_addadd_n(rp, r1, r2, r3, sn);
+         cy = mpn_addadd_n(rp, r1, r2, r3, s1);
 			*rn = r1n;
 			if (cy) 
          {
-            rp[sn] = cy;
+            rp[s1] = cy;
             if ((*rn) < 0) (*rn)--;
             else (*rn)++;
          }
 		} else if (((r1n ^ r2n) >= 0) && ((r1n ^ r3n) < 0)) // addsub
 		{
-			cy = mpn_addsub_n(rp, r1, r2, r3, sn);
-			*rn = r1n;
-			if (cy > CNST_LIMB(0)) 
+			MPN_ADDSUB_CMP(cy2, r1, r2, r3, s1);
+			
+			if (cy2 > 0)
 			{
-				rp[sn] = cy;
-            if ((*rn) < 0) (*rn)--;
-            else (*rn)++;
-			} else if (cy < CNST_LIMB(0))
+				cy = mpn_addsub_n(rp, r1, r2, r3, s1);
+			   *rn = r1n;
+			   if (cy) 
+			   {
+				   rp[s1] = cy;
+               if ((*rn) < 0) (*rn)--;
+               else (*rn)++;
+			   }
+			} else if (cy2 < 0)
 			{
-				mpn_com_n(rp, rp, sn);
-				mpn_add_1(rp, rp, sn, CNST_LIMB(1));
-				*rn = -(*rn);
+				cy = mpn_subadd_n(rp, r3, r1, r2, s1);
+				if (cy) abort();
+				*rn = s1;
+			   MPN_NORMALIZE(rp, (*rn));
+				if (r1n < 0) *rn = -(*rn);
+			} else
+			{
+		      tc4_add(rp, rn, r1, r1n, r2, r2n);
+		      tc4_add(rp, rn, rp, *rn, r3, r3n);
 			}
 		} else if (((r1n ^ r2n) < 0) && ((r1n ^ r3n) >= 0)) // subadd
 		{
-			cy = mpn_addsub_n(rp, r1, r3, r2, sn);
-			*rn = r1n;
-			if (cy > CNST_LIMB(0)) 
+			MPN_ADDSUB_CMP(cy2, r1, r3, r2, s1);
+			
+			if (cy2 > 0)
 			{
-				rp[sn] = cy;
-            if ((*rn) < 0) (*rn)--;
-            else (*rn)++;
-			} else if (cy < CNST_LIMB(0))
+				cy = mpn_addsub_n(rp, r1, r3, r2, s1);
+			   *rn = r1n;
+			   if (cy) 
+			   {
+				   rp[s1] = cy;
+               if ((*rn) < 0) (*rn)--;
+               else (*rn)++;
+			   }
+			} else if (cy2 < 0)
 			{
-				mpn_com_n(rp, rp, sn);
-				mpn_add_1(rp, rp, sn, CNST_LIMB(1));
-				*rn = -(*rn);
+				mpn_subadd_n(rp, r2, r1, r3, s1);
+			   *rn = s1;
+			   MPN_NORMALIZE(rp, (*rn));
+				if (r1n > 0) *rn = -(*rn);
+			} else
+			{
+		      tc4_add(rp, rn, r1, r1n, r2, r2n);
+		      tc4_add(rp, rn, rp, *rn, r3, r3n);
 			}
 		} else // add final two and subtract first  
 		{
-			cy = mpn_addsub_n(rp, r2, r3, r1, sn);
-			*rn = -r1n;
-			if (cy < CNST_LIMB(0)) 
+			MPN_ADDSUB_CMP(cy2, r2, r3, r1, s1);
+			
+			if (cy2 > 0)
 			{
-				rp[sn] = -cy;
-            if ((*rn) < 0) (*rn)--;
-            else (*rn)++;
-			} else if (cy > CNST_LIMB(0))
+				cy = mpn_addsub_n(rp, r2, r3, r1, s1);
+			   *rn = r1n;
+			   if (cy) 
+			   {
+				   rp[s1] = cy;
+               if ((*rn) < 0) (*rn)--;
+               else (*rn)++;
+			   }
+			} else if (cy2 < 0)
 			{
-				mpn_com_n(rp, rp, sn);
-				mpn_add_1(rp, rp, sn, CNST_LIMB(1));
-				*rn = -(*rn);
+				mpn_subadd_n(rp, r1, r2, r3, s1);
+			   *rn = s1;
+			   MPN_NORMALIZE(rp, (*rn));
+				if (r1n < 0) *rn = -(*rn);
+   		} else
+			{
+		      tc4_add(rp, rn, r1, r1n, r2, r2n);
+		      tc4_add(rp, rn, rp, *rn, r3, r3n);
 			}
 		}
 	}
@@ -402,6 +450,8 @@ void tc4_subsub(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, 
 {
 	tc4_addadd(rp, rn, r1, r1n, r2, -r2n, r3, -r3n);
 }
+
+*/
 
 void tc4_add_unsigned(mp_ptr rp, mp_size_t * rn, mp_ptr r1, mp_size_t r1n, mp_ptr r2, mp_size_t r2n)
 {
@@ -500,7 +550,8 @@ void tc4_addlsh1_unsigned(mp_ptr rp, mp_size_t * rn, mp_srcptr xp, mp_size_t xn)
 	}
 }
 
-/*void tc4_divexact_ui(mp_ptr rp, mp_size_t * rn, mp_srcptr x, mp_size_t xn, mp_limb_t c)
+/*
+void tc4_divexact_ui(mp_ptr rp, mp_size_t * rn, mp_srcptr x, mp_size_t xn, mp_limb_t c)
 {
 	if (xn)
 	{
@@ -516,7 +567,8 @@ void tc4_addlsh1_unsigned(mp_ptr rp, mp_size_t * rn, mp_srcptr xp, mp_size_t xn)
 			else *rn = xn;
 		}	
 	} else *rn = 0;
-}*/
+}
+*/
 
 void tc4_divexact_ui(mp_ptr rp, mp_size_t * rn, mp_ptr x, mp_size_t xn, mp_limb_t c)
 {
@@ -869,12 +921,12 @@ mpn_mul_tc4 (mp_ptr rp, mp_ptr up,
 
    tc4_add_unsigned(r6, &n6, a3, a3n, a1, a1n); 
    tc4_add_unsigned(r5, &n5, a2, a2n, a0, a0n); 
-	//tc4_add_unsigned(r3, &n3, r5, n5, r6, n6); //##############
+	//tc4_add_unsigned(r3, &n3, r5, n5, r6, n6); 
    //tc4_sub(r4, &n4, r5, n5, r6, n6);
    tc4_sumdiff_unsigned(r3, &n3, r4, &n4, r5, n5, r6, n6); 
 	tc4_add_unsigned(r6, &n6, b3, b3n, b1, b1n);
    tc4_add_unsigned(r5, &n5, b2, b2n, b0, b0n);
-   //tc4_add_unsigned(r7, &n7, r5, n5, r6, n6); //################
+   //tc4_add_unsigned(r7, &n7, r5, n5, r6, n6); 
    //tc4_sub(r5, &n5, r5, n5, r6, n6);
    tc4_sumdiff_unsigned(r7, &n7, r5, &n5, r5, n5, r6, n6); 
 	
@@ -919,14 +971,14 @@ mpn_mul_tc4 (mp_ptr rp, mp_ptr up,
    tc4_rshift_inplace(r4, &n4, 1);
 	
 	tc4_sub(r3, &n3, r3, n3, r4, n4);
-	//tc4_lshift(r5, &n5, r5, n5, 1); //###############  
-	//tc4_sub(r5, &n5, r5, n5, r6, n6);
-   tc4_addsub(r5, &n5, r5, n5, r5, n5, r6, n6);
+	tc4_lshift(r5, &n5, r5, n5, 1); 
+	tc4_sub(r5, &n5, r5, n5, r6, n6);
+   //tc4_addsub(r5, &n5, r5, n5, r5, n5, r6, n6);
 
    tc4_submul_1(r2, &n2, r3, n3, 65);
-	//tc4_sub(r3, &n3, r3, n3, r7, n7); //################ 
-   //tc4_sub(r3, &n3, r3, n3, r1, n1);
-   tc4_subsub(r3, &n3, r3, n3, r7, n7, r1, n1);
+	tc4_sub(r3, &n3, r3, n3, r7, n7); 
+   tc4_sub(r3, &n3, r3, n3, r1, n1);
+   //tc4_subsub(r3, &n3, r3, n3, r7, n7, r1, n1);
 
    tc4_addmul_1(r2, &n2, r3, n3, 45);
    tc4_submul_1(r5, &n5, r3, n3, 8);
