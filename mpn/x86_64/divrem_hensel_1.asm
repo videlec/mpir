@@ -29,6 +29,9 @@ C	On k8/k10 the shifting comes for free so no need to have different
 C	fn for that. And on K8/K10 this runs at 10c/l which is optimal
 C	This function "replaces" divexact_1 and modexact_1_odd
 
+DONT USE until we have sorted out the return value
+
+
 ASM_START()
 PROLOGUE(mpn_divrem_hensel_1)
 mov $1,%r9

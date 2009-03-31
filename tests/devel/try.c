@@ -745,6 +745,7 @@ param_init (void)
   p->src[1] = 1;
   p->msize = 2;
   p->overlap = OVERLAP_NOT_SRC2;
+  //p->overlap=OVERLAP_NONE;
   REFERENCE (refmpn_mul_2);
 
 
