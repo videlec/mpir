@@ -5,3 +5,5 @@ added to tests,speed
 not added to fat structure
 not added to try
 added temp file x86-asm.def.m4
+
+must add submul_basecase to speed

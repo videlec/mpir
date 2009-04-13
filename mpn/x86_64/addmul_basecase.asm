@@ -200,6 +200,7 @@ adc %rdx,%r10
 	lea 8(%rdi),%rdi
 ')
 
+# i'm sure we can remove some repeated stuff form this
 define(`MPN_MULADDMUL_1_INT',`
 ADDMULNEXT$1
 jz end$1
