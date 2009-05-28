@@ -1,0 +1,47 @@
+#!/bin/bash
+# copy this file and FFT* and profile* to mpir-root and run it
+
+CPUS=$(cat /proc/cpuinfo  | grep -ce processor)
+if [ $CPUS -lt 1 ] ; then CPUS=1 ; fi
+make distclean
+./configure && make -j $CPUS && make -j $CPUS check
+if [ $? -ne 0 ] ; then exit 1 ; fi
+cd tune
+make -j $CPUS tuneup
+if [ $? -ne 0 ] ; then exit 1 ; fi
+./tuneup -f 1000000 | tee ../gmp-mparam.h
+if [ $? -ne 0 ] ; then exit 1 ; fi
+cd ..
+make clean
+
+./configure && make -j $CPUS && make -j $CPUS check
+if [ $? -ne 0 ] ; then exit 1 ; fi
+
+gcc -std=c99 -O3 -c profiler.c -o profiler.o
+if [ $? -ne 0 ] ; then exit 1 ; fi
+
+gcc -std=c99 -O3 FFT-tuning.c profiler.o -o FFT-tuning -L.libs -I. -lm -lmpir
+if [ $? -ne 0 ] ; then exit 1 ; fi
+
+export LD_LIBRARY_PATH=.libs
+
+./FFT-tuning | tee  newparam
+
+cat newparam >> gmp-mparam.h
+
+make clean
+make -j $CPUS && make -j $CPUS check
+if [ $? -ne 0 ] ; then exit 1 ; fi
+
+gcc -std=c99 -O3 -c profiler.c -o profiler.o
+if [ $? -ne 0 ] ; then exit 1 ; fi
+
+gcc -std=c99 -O3 FFT-tuning2.c profiler.o -o FFT-tuning2 -L.libs -I. -lm -lmpir
+if [ $? -ne 0 ] ; then exit 1 ; fi
+
+./FFT-tuning2 | tee newparam2
+
+cat newparam2 >> gmp-mparam.h
+
+./configure && make -j $CPUS && make -j $CPUS check
+if [ $? -ne 0 ] ; then exit 1 ; fi
