@@ -19,11 +19,32 @@ if [ $SYSNAME == "varro" ] ; then
 fi
 echo "Using $CPUS cpus"
 
+FAT=0
+SYS=$(./configfsf.guess | cut -f 1 -d -)
+if [ $SYS == "x86_64" ] ; then FAT=1 ; fi
+if [ $SYS == "x86" ] ; then FAT=1 ; fi
 
-CONFOPTIONS=""
-mkdir $SYSNAME && cd $SYSNAME && ../configure $CONFOPTIONS && make -j $CPUS && make -j $CPUS check && cd .. && rm -rf $SYSNAME
-if [ $? -ne 0 ] ; then echo "FAILED with confoptions $CONFOPTIONS" ; exit 1 ; fi
+# standard build
+OPT=""
+# all features
+OPT="--enable-cxx --enable-gmpcompat"
+# all features and debug
+OPT="--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+# maximum debug
+OPT="--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=none"
+if [ $FAT -eq 1 ] ; then
+	# standard build
+	OPT="--enable-fat"
+	# all features
+	OPT="--enable-fat --enable-cxx --enable-gmpcompat"
+	# all features and debug
+	OPT="--enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+fi
+
+
+mkdir $SYSNAME && cd $SYSNAME && ../configure $OPT && make -j $CPUS && make -j $CPUS check && cd .. && rm -rf $SYSNAME
+if [ $? -ne 0 ] ; then echo "FAILED with options $OPT" ; exit 1 ; fi
 
 
 
-# try fat ,cxx ,assert, generic , differnt gcc
+# try differnt gcc , build try 

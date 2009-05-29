@@ -1,5 +1,5 @@
 #!/bin/bash
-# copy this file and FFT* and profile* to mpir-root and run it
+# copy this file and FFT* and profile* to dir and run it with path of configure
 CPUS=1
 FLAGS=
 if [ -f /proc/cpuinfo ] ; then
@@ -11,7 +11,7 @@ if [ $(uname -n) == "mark" ] ; then
 	CPUS=2
 fi
 make distclean
-./configure && make -j $CPUS && make -j $CPUS check
+$1/configure && make -j $CPUS && make -j $CPUS check
 if [ $? -ne 0 ] ; then exit 1 ; fi
 cd tune
 make -j $CPUS tuneup
@@ -21,7 +21,7 @@ if [ $? -ne 0 ] ; then exit 1 ; fi
 cd ..
 make clean
 
-./configure && make -j $CPUS && make -j $CPUS check
+$1/configure && make -j $CPUS && make -j $CPUS check
 if [ $? -ne 0 ] ; then exit 1 ; fi
 
 gcc -std=c99 -O3 $FLAGS -c profiler.c -o profiler.o
@@ -50,5 +50,5 @@ if [ $? -ne 0 ] ; then exit 1 ; fi
 
 cat newparam2 >> gmp-mparam.h
 
-./configure && make -j $CPUS && make -j $CPUS check
+$1/configure && make -j $CPUS && make -j $CPUS check
 if [ $? -ne 0 ] ; then exit 1 ; fi
