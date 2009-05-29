@@ -8,7 +8,7 @@ if [ -f /proc/cpuinfo ] ; then
 fi
 if [ $(uname -n) == "mark" ] ; then
 	FLAGS="-m64 -mptr64 -mcpu=ultrasparc3"
-	#CPUS=2   doesn't like this , make check fails sometimes
+	CPUS=2
 fi
 make distclean
 ./configure && make -j $CPUS && make -j $CPUS check

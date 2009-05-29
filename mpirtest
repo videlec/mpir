@@ -1,0 +1,29 @@
+#!/bin/bash
+# copy this file to mpir root and run it
+
+SYSNAME=$(uname -n)
+if [ -e $SYSNAME ] ; then echo "ERROR directory $SYSNAME allready exist" ; exit 1 ; fi
+
+CPUS=1
+if [ -f /proc/cpuinfo ] ; then
+	CPUS=$(cat /proc/cpuinfo  | grep -ce processor)
+fi
+if [ $SYSNAME == "mark" ] ; then
+	CPUS=2
+fi
+if [ $SYSNAME == "mark2" ] ; then
+	CPUS=2
+fi
+if [ $SYSNAME == "varro" ] ; then
+	CPUS=2
+fi
+echo "Using $CPUS cpus"
+
+
+CONFOPTIONS=""
+mkdir $SYSNAME && cd $SYSNAME && ../configure $CONFOPTIONS && make -j $CPUS && make -j $CPUS check && cd .. && rm -rf $SYSNAME
+if [ $? -ne 0 ] ; then echo "FAILED with confoptions $CONFOPTIONS" ; exit 1 ; fi
+
+
+
+# try fat ,cxx ,assert, generic , differnt gcc
