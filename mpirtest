@@ -5,7 +5,7 @@
 DIR=$(pwd)
 if [ $# -eq 1 ] ; then 
 	# get absolute directory
-	REL=$(echo $1 | head -c 1)
+	REL=$(echo $1 | cut -b 1)
 	if [ $REL == "/" ] ; then
 	       DIR=$1
 	else
