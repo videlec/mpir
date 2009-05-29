@@ -75,7 +75,7 @@ if [ $? -ne 0 ] ; then echo "FAILED with options $1 $2 $3" ; exit 1 ; fi
 
 for C in $COMP
 do
-	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++)
+	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/)
 	# standard build
 	build $C $CX ""
 	# all features
