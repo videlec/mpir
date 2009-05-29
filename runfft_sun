@@ -1,0 +1,26 @@
+#!/bin/bash
+# copy this file and FFT* and profile* to mpir-root and run it
+CPUS=1
+FLAGS=
+if [ -f /proc/cpuinfo ] ; then
+	CPUS=$(cat /proc/cpuinfo  | grep -ce processor)
+	if [ $CPUS -lt 1 ] ; then CPUS=1 ; fi
+fi
+if [ $(uname -n) == "mark" ] ; then
+	FLAGS="-m64 -mptr64 -mcpu=ultrasparc3"
+	CPUS=2
+fi
+make distclean
+./configure && make -j $CPUS && make -j $CPUS check
+if [ $? -ne 0 ] ; then exit 1 ; fi
+cd tune
+make -j $CPUS tuneup
+if [ $? -ne 0 ] ; then exit 1 ; fi
+./tuneup -f 1000000 | tee ../gmp-mparam.h
+if [ $? -ne 0 ] ; then exit 1 ; fi
+cd ..
+make clean
+
+./configure && make -j $CPUS && make -j $CPUS check
+if [ $? -ne 0 ] ; then exit 1 ; fi
+
