@@ -67,28 +67,30 @@ if [ $SYS == "x86_64" ] ; then FAT=1 ; fi
 if [ $SYS == "x86" ] ; then FAT=1 ; fi
 
 function build {
-echo -e "\n\n\nTrying $1 $2\n\n\n"
-mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && $DIR/configure $2 && make -j $CPUS && make -j $CPUS check && cd .. && rm -rf $SYSNAME
-if [ $? -ne 0 ] ; then echo "FAILED with options $1 $2" ; exit 1 ; fi
+echo -e "\n\n\nTrying $1 $2 $3\n\n\n"
+mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && export CXX=$2 && $DIR/configure $3 && make -j $CPUS && \
+	make -j $CPUS check && cd .. && rm -rf $SYSNAME
+if [ $? -ne 0 ] ; then echo "FAILED with options $1 $2 $3" ; exit 1 ; fi
 }
 
 for C in $COMP
 do
+	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++)
 	# standard build
-	build $C ""
+	build $C $CX ""
 	# all features
-	build $C "--enable-cxx --enable-gmpcompat"
+	build $C $CX "--enable-cxx --enable-gmpcompat"
 	# all features and debug
-	build $C "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	# maximum debug
-	build $C "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=none"
+	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=none"
 	if [ $FAT -eq 1 ] ; then
 		# standard build
-		build $C "--enable-fat"
+		build $C $CX "--enable-fat"
 		# all features
-		build $C "--enable-fat --enable-cxx --enable-gmpcompat"
+		build $C $CX "--enable-fat --enable-cxx --enable-gmpcompat"
 		# all features and debug
-		build $C "--enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+		build $C $CX "--enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	fi
 done
 
