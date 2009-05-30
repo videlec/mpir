@@ -23,16 +23,19 @@ if [ -e $SYSNAME ] ; then echo "ERROR directory $SYSNAME allready exist" ; exit 
 
 CPUS=1
 COMP="gcc"
+SUN=0
 if [ -f /proc/cpuinfo ] ; then
 	CPUS=$(cat /proc/cpuinfo  | grep -ce processor)
 fi
 if [ $SYSNAME == "mark" ] ; then
 	CPUS=2
-	COMP="gcc gcc-4.3.3 cc"
+	COMP="cc gcc gcc-4.3.3"
+	SUN=1
 fi
 if [ $SYSNAME == "mark2" ] ; then
 	CPUS=2
-	COMP="gcc gcc-4.3.3 cc"
+	COMP="cc gcc gcc-4.3.3"
+	SUN=1
 fi
 if [ $SYSNAME == "varro" ] ; then
 	CPUS=2
@@ -57,6 +60,7 @@ fi
 if [ $SYSNAME == "fulvia" ] ; then
 	CPUS=4
 	COMP="gcc gcc-4.3.3 cc"
+	SUN=1
 	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"	
 fi
 if [ $SYSNAME == "eno" ] ; then
@@ -84,6 +88,9 @@ if [ $? -ne 0 ] ; then echo "FAILED with options $1 $2 $3" ; exit 1 ; fi
 for C in $COMP
 do
 	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/icc/)
+	if [ $SUN -eq 1 ] ; then
+		CX=$(echo $CX | sed s/c++/CC/)
+	fi
 	# standard build
 	build $C $CX ""
 	# all features
