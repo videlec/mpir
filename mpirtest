@@ -43,7 +43,7 @@ if [ $SYSNAME == "cleo" ] ; then
 	# cc is broken on ia64
 fi
 if [ $SYSNAME == "iras" ] ; then
-	COMP="gcc gcc-4.3.3 icc"
+	COMP="gcc gcc-4.3.3"
 	# cc is broken on ia64
 fi
 if [ $SYSNAME == "cicero" ] ; then
@@ -74,14 +74,14 @@ if [ $SYS == "x86" ] ; then FAT=1 ; fi
 
 function build {
 echo -e "\n\n\nTrying $1 $2 $3\n\n\n"
-mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && export CXX=$2 && $DIR/configure $3 && make -j $CPUS && $HACK && \
+mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && export CXX=$2 && $DIR/configure $3 && make -j $CPUS && /bin/bash -c "$HACK" && \
 	make -j $CPUS check && cd .. && rm -rf $SYSNAME
 if [ $? -ne 0 ] ; then echo "FAILED with options $1 $2 $3" ; exit 1 ; fi
 }
 
 for C in $COMP
 do
-	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/)
+	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/icc/)
 	# standard build
 	build $C $CX ""
 	# all features
