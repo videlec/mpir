@@ -37,10 +37,12 @@ if [ $SYSNAME == "varro" ] ; then
 	COMP="gcc gcc-3.3"
 fi
 if [ $SYSNAME == "cleo" ] ; then
-	COMP="gcc gcc-4.3.3 cc"
+	COMP="gcc gcc-4.3.3 icc"
+	# cc is broken on ia64
 fi
 if [ $SYSNAME == "iras" ] ; then
-	COMP="gcc gcc-4.3.3 cc"
+	COMP="gcc gcc-4.3.3 icc"
+	# cc is broken on ia64
 fi
 if [ $SYSNAME == "cicero" ] ; then
 	COMP="gcc gcc-4.3.3 cc"
@@ -56,7 +58,8 @@ if [ $SYSNAME == "eno" ] ; then
 	COMP="gcc gcc-4.3.3 cc"
 fi
 if [ $SYSNAME == "modular" ] ; then
-	COMP="gcc gcc-3.4"
+	COMP="gcc"
+	# gcc-3.4 is broken on modular , has no g++
 fi
 # cato=sca-m0n8.scsystem sage cuda1?
 echo "Using $CPUS cpus"
