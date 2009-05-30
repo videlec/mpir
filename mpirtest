@@ -40,6 +40,8 @@ if [ $SYSNAME == "varro" ] ; then
 fi
 if [ $SYSNAME == "cleo" ] ; then
 	COMP="gcc gcc-4.3.3 icc"
+	LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/intel-11.0.081/ia64-Linux-rhel/lib/ia64
+	export LD_LIBRARY_PATH
 	# cc is broken on ia64
 fi
 if [ $SYSNAME == "iras" ] ; then
