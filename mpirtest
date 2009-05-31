@@ -73,6 +73,7 @@ FAT=0
 SYS=$($DIR/configfsf.guess | cut -f 1 -d -)
 if [ $SYS == "x86_64" ] ; then FAT=1 ; fi
 if [ $SYS == "x86" ] ; then FAT=1 ; fi
+SYS=none-$($DIR/config.guess | cut -f 2- -d -)
 
 function build {
 echo -e "\n\n\nTrying $1 $2 $3\n\n\n"
@@ -94,7 +95,7 @@ do
 	# all features and debug
 	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	# maximum debug
-	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=none"
+	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=$SYS"
 	if [ $FAT -eq 1 ] ; then
 		# standard build
 		build $C $CX "--enable-fat"
