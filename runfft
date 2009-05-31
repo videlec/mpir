@@ -30,7 +30,7 @@ if [ $? -ne 0 ] ; then exit 1 ; fi
 gcc -std=c99 -O3 $FLAGS FFT-tuning.c profiler.o -o FFT-tuning -L.libs -I. -lm -lmpir
 if [ $? -ne 0 ] ; then exit 1 ; fi
 
-export LD_LIBRARY_PATH=.libs
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.libs
 
 ./FFT-tuning | tee  newparam
 

@@ -29,6 +29,7 @@ fi
 if [ $SYSNAME == "mark" ] ; then
 	CPUS=2
 	COMP="gcc gcc-4.3.3 cc"
+	# for cc which is sun's cc and build=none-*** we want flags=-O1 not the default -O
 fi
 if [ $SYSNAME == "mark2" ] ; then
 	CPUS=2
@@ -59,6 +60,7 @@ if [ $SYSNAME == "fulvia" ] ; then
 	COMP="gcc gcc-4.3.3 cc"
 	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"
 	# needed for c++ compiler when building with build=none-xxxx
+	# only really want to set this when build=none-****
 	export CFLAGS=-m64
 	export CXXFLAGS=-m64
 fi
