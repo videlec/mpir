@@ -57,7 +57,10 @@ fi
 if [ $SYSNAME == "fulvia" ] ; then
 	CPUS=4
 	COMP="gcc gcc-4.3.3 cc"
-	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"	
+	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"
+	# needed for c++ compiler when building with build=none-xxxx
+	export CFLAGS=-m64
+	export CXXFLAGS=-m64
 fi
 if [ $SYSNAME == "eno" ] ; then
 	COMP="gcc gcc-4.3.3 cc"
