@@ -29,11 +29,15 @@ fi
 if [ $SYSNAME == "mark" ] ; then
 	CPUS=2
 	COMP="gcc gcc-4.3.3 cc"
+	TCFLAGS=-O1
+	TCXXFLAGS=-O1
 	# for cc which is sun's cc and build=none-*** we want flags=-O1 not the default -O
 fi
 if [ $SYSNAME == "mark2" ] ; then
 	CPUS=2
 	COMP="gcc gcc-4.3.3 cc"
+	TCFLAGS=-O1
+	TCXXFLAGS=-O1
 fi
 if [ $SYSNAME == "varro" ] ; then
 	CPUS=2
@@ -43,11 +47,11 @@ if [ $SYSNAME == "cleo" ] ; then
 	COMP="gcc gcc-4.3.3 icc"
 	LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/intel-11.0.081/ia64-Linux-rhel/lib/ia64
 	export LD_LIBRARY_PATH
-	# cc is broken on ia64
+	# cc=gcc-4.1.2 is broken on ia64
 fi
 if [ $SYSNAME == "iras" ] ; then
 	COMP="gcc gcc-4.3.3"
-	# cc is broken on ia64
+	# cc=gcc-4.1.2 is broken on ia64
 fi
 if [ $SYSNAME == "cicero" ] ; then
 	COMP="gcc gcc-4.3.3 cc"
@@ -61,8 +65,8 @@ if [ $SYSNAME == "fulvia" ] ; then
 	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"
 	# needed for c++ compiler when building with build=none-xxxx
 	# only really want to set this when build=none-****
-	export CFLAGS=-m64
-	export CXXFLAGS=-m64
+	TCFLAGS=-m64
+	TCXXFLAGS=-m64
 fi
 if [ $SYSNAME == "eno" ] ; then
 	COMP="gcc gcc-4.3.3 cc"
@@ -100,7 +104,11 @@ do
 	# all features and debug
 	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	# maximum debug
+	export CFLAGS=TCFLAGS
+	export CXXFLAGS=TCXXFLAGS
 	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=$SYS"
+	unset CFLAGS
+	unset CXXFLAGS
 	if [ $FAT -eq 1 ] ; then
 		# standard build
 		build $C $CX "--enable-fat"

@@ -1,4 +1,8 @@
 #!/bin/bash
+
+LIM=$(cat ../../gmp-mparam.h | grep -e SQR_KARATSUBA_THRESHOLD)
+LIM=32
+
 while true
 do
 ./try -R -s 1-20 -r 1 mpn_add_n mpn_sub_n mpn_xor_n mpn_and_n mpn_ior_n mpn_nand_n mpn_nior_n mpn_xnor_n mpn_andn_n mpn_addmul_2 \
@@ -8,12 +12,8 @@ do
 		mpn_mul_2 mpn_divexact_byBm1of mpn_divrem_euclidean_qr_1 mpn_divrem_euclidean_r_1 mpn_lshift2 mpn_rshift2 \
 		mpn_divrem_1 mpn_mod_1 mpn_sb_divrem_mn mpn_store MPN_ZERO
 if [ $? -ne 0 ] ; then exit 1 ; fi
-./try -R -s 1-50 -r 1 mpn_mul_basecase mpn_sqr_basecase mpn_redc_basecase mpn_tdiv_qr
+./try -R -s 1-50 -r 1 mpn_mul_basecase mpn_redc_basecase mpn_tdiv_qr
 if [ $? -ne 0 ] ; then exit 1 ; fi
-#./try -R -s 10-300 -r 1 mpn_kara_mul_n mpn_kara_sqr_n
-#if [ $? -ne 0 ] ; then exit 1 ; fi
-#./try -R -s 50-1000 -r 1 mpn_toom3_mul_n mpn_toom3_sqr_n
-#if [ $? -ne 0 ] ; then exit 1 ; fi
-#./try -R -s 1-1000 -r 1 mpn_mul_n mpn_sqr_n mpn_mul
-#if [ $? -ne 0 ] ; then exit 1 ; fi
+./try -R -s 1-$LIM -r 1 mpn_sqr_basecase
+if [ $? -ne 0 ] ; then exit 1 ; fi
 done
