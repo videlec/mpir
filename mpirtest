@@ -44,10 +44,11 @@ if [ $SYSNAME == "varro" ] ; then
 	COMP="gcc gcc-3.3"
 fi
 if [ $SYSNAME == "cleo" ] ; then
-	COMP="gcc gcc-4.3.3 icc"
-	LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/intel-11.0.081/ia64-Linux-rhel/lib/ia64
-	export LD_LIBRARY_PATH
+	COMP="gcc gcc-4.3.3"
+	#LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/intel-11.0.081/ia64-Linux-rhel/lib/ia64
+	#export LD_LIBRARY_PATH  dont know is we need this now
 	# cc=gcc-4.1.2 is broken on ia64
+	# icc is broken for the moment
 fi
 if [ $SYSNAME == "iras" ] ; then
 	COMP="gcc gcc-4.3.3"
@@ -93,7 +94,7 @@ if [ $? -ne 0 ] ; then echo "FAILED with options $1 $2 $3" ; exit 1 ; fi
 
 for C in $COMP
 do
-	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/icc/)
+	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/icpc/)
 	if [ $(uname) == "SunOS" ] ; then
 		CX=$(echo $CX | sed s/c++/CC/)
 	fi
