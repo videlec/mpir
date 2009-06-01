@@ -105,8 +105,8 @@ do
 	# all features and debug
 	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	# maximum debug
-	export CFLAGS=TCFLAGS
-	export CXXFLAGS=TCXXFLAGS
+	export CFLAGS=$TCFLAGS
+	export CXXFLAGS=$TCXXFLAGS
 	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=$SYS"
 	unset CFLAGS
 	unset CXXFLAGS
