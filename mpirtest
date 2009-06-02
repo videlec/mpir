@@ -31,7 +31,7 @@ if [ $SYSNAME == "mark" ] ; then
 	COMP="gcc gcc-4.3.3 cc"
 	TCFLAGS=-O1
 	TCXXFLAGS=-O1
-	# for cc which is sun's cc and build=none-*** we want flags=-O1 not the default -O
+	# only really need the flags for cc
 fi
 if [ $SYSNAME == "mark2" ] ; then
 	CPUS=2
@@ -64,8 +64,6 @@ if [ $SYSNAME == "fulvia" ] ; then
 	CPUS=4
 	COMP="gcc gcc-4.3.3 cc"
 	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"
-	# needed for c++ compiler when building with build=none-xxxx
-	# only really want to set this when build=none-****
 	TCFLAGS=-m64
 	TCXXFLAGS=-m64
 fi
@@ -76,7 +74,6 @@ if [ $SYSNAME == "modular" ] ; then
 	COMP="gcc"
 	# gcc-3.4 is broken on modular , has no g++
 fi
-# cato=sca-m0n8.scsystem sage cuda1?
 echo "Using $CPUS cpus"
 
 FAT=0
