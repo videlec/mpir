@@ -10,6 +10,14 @@ if [ $(uname -n) == "mark" ] ; then
 	FLAGS="-m64 -mptr64 -mcpu=ultrasparc3"
 	CPUS=2
 fi
+if [ $(uname -n) == "mark2" ] ; then
+	FLAGS="-m64 -mptr64 -mcpu=ultrasparc3"
+	CPUS=2
+fi
+if [ $(uname -n) == "varro" ] ; then
+	FLAGS="-m64"
+	CPUS=2
+fi
 make distclean
 $1/configure && make -j $CPUS && make -j $CPUS check
 if [ $? -ne 0 ] ; then exit 1 ; fi
@@ -31,7 +39,7 @@ gcc -std=c99 -O3 $FLAGS FFT-tuning.c profiler.o -o FFT-tuning -L.libs -I. -lm -l
 if [ $? -ne 0 ] ; then exit 1 ; fi
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.libs
-
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:.libs
 ./FFT-tuning | tee  newparam
 
 cat newparam >> gmp-mparam.h
