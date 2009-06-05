@@ -39,6 +39,12 @@ if [ $SYSNAME == "mark2" ] ; then
 	TCFLAGS=-O1
 	TCXXFLAGS=-O1
 fi
+if [ $SYSNAME == "t2" ] ; then
+	CPUS=8
+	COMP="gcc cc"
+	#TCFLAGS=-O1
+	#TCXXFLAGS=-O1
+fi
 if [ $SYSNAME == "varro" ] ; then
 	CPUS=2
 	COMP="gcc gcc-3.3"
