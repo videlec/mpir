@@ -42,6 +42,7 @@ fi
 if [ $SYSNAME == "t2" ] ; then
 	CPUS=8
 	COMP="gcc cc"
+	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/sparc-solaris-toolchain/lib/sparcv9
 	#TCFLAGS=-O1
 	#TCXXFLAGS=-O1
 fi
