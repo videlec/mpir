@@ -101,8 +101,10 @@ do
 	if [ $(uname) == "SunOS" ] ; then
 		CX=$(echo $CX | sed s/c++/CC/)
 	fi
-	if [ $C = "cc" ] ; then
-		LD=$TLD
+	if [ $C == "cc" ] ; then
+		if [ -n $TLD ] ; then
+			LD=$TLD
+		fi
 		# it would be nice if we set this back on exit
 	fi
 	# standard build
