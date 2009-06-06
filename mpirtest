@@ -43,8 +43,7 @@ if [ $SYSNAME == "t2" ] ; then
 	CPUS=8
 	COMP="gcc cc"
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/sparc-solaris-toolchain/lib/sparcv9
-	#TCFLAGS=-O1
-	#TCXXFLAGS=-O1
+        TLD=/usr/ccs/bin/sparcv9/ld
 fi
 if [ $SYSNAME == "varro" ] ; then
 	CPUS=2
@@ -101,6 +100,10 @@ do
 	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/icpc/)
 	if [ $(uname) == "SunOS" ] ; then
 		CX=$(echo $CX | sed s/c++/CC/)
+	fi
+	if [ $C = "cc" ] ; then
+		LD=$TLD
+		# it would be nice if we set this back on exit
 	fi
 	# standard build
 	build $C $CX ""
