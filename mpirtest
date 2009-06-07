@@ -3,7 +3,7 @@
 # first param is mpir directory
 
 HACK="echo 0"
-
+TLD=""
 DIR=$(pwd)
 if [ $# -eq 1 ] ; then 
 	# get absolute directory
@@ -103,7 +103,7 @@ do
 	fi
 	if [ $C == "cc" ] ; then
 		if [ -n $TLD ] ; then
-			LD=$TLD
+			export LD=$TLD
 		fi
 		# it would be nice if we set this back on exit
 	fi
