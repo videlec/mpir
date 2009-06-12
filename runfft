@@ -1,6 +1,7 @@
 #!/bin/bash
 # copy this file and FFT* and profile* to dir and run it with path of configure
 CPUS=1
+
 FLAGS=
 if [ -f /proc/cpuinfo ] ; then
 	CPUS=$(cat /proc/cpuinfo  | grep -ce processor)
