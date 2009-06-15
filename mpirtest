@@ -24,7 +24,7 @@ if [ -e $SYSNAME ] ; then echo "ERROR directory $SYSNAME allready exist" ; exit 
 CPUS=1
 COMP="gcc"
 if [ -f /proc/cpuinfo ] ; then
-	CPUS=$(cat /proc/cpuinfo  | grep -ce processor)
+	CPUS=$(cat /proc/cpuinfo  | grep -ce ^processor)
 fi
 if [ $SYSNAME == "mark" ] ; then
 	CPUS=2

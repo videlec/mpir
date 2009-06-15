@@ -4,7 +4,7 @@ CPUS=1
 
 FLAGS=
 if [ -f /proc/cpuinfo ] ; then
-	CPUS=$(cat /proc/cpuinfo  | grep -ce processor)
+	CPUS=$(cat /proc/cpuinfo  | grep -ce ^processor)
 	if [ $CPUS -lt 1 ] ; then CPUS=1 ; fi
 fi
 if [ $(uname -n) == "mark" ] ; then
