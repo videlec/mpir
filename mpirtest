@@ -83,7 +83,6 @@ if [ $SYSNAME == "modular" ] ; then
 fi
 echo "Using $CPUS cpus"
 
-
 FATCPU="x86_64\ni486\npentium\npentiummmx\npentiumpro\npentium2\npentium3\ncore\ncore2\npenryn\nnehalem\natom\nnetburst\nnetburtslahf\npentium4\nprescott\nk5\nk6\nk62\nk63\nk7\nk8\nk10\nviac3\nviac32"
 FAT=0
 SYS=$($DIR/config.guess | cut -f 1 -d -)
@@ -94,8 +93,8 @@ function build {
 echo -e "\n\n\nTrying $1 $2 $3\n\n\n"
 mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && export CXX=$2 && $DIR/configure $3 && make -j $CPUS && /bin/bash -c "$HACK" && \
 	make -j $CPUS check && cd .. && rm -rf $SYSNAME
-if [ $? -ne 0 ] ; then echo "${SUCCESS}FAILED CC=$1 CXX=$2 configure=$3" ; exit 1 ; fi
-SUCCESS=$(echo -e "${SUCCESS}PASSED CC=$1 CXX=$2 configure=$3\n")
+if [ $? -ne 0 ] ; then echo -e "${SYSNAME}\n${SUCCESS}\nFAILED CC=$1 CXX=$2 configure=$3" ; exit 1 ; fi
+SUCCESS=$(echo -e "${SUCCESS}\nPASSED CC=$1 CXX=$2 configure=$3")
 }
 
 for C in $COMP
@@ -131,5 +130,5 @@ do
 		build $C $CX "--enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	fi
 done
-echo $SUCCESS
+echo -e "${SYSNAME}\n$SUCCESS"
 # try build try 
