@@ -1,9 +1,11 @@
-#!/bin/bash
+#!/bin/sh
+#    sh not bash for mingw
 # run this in the directory where everything will be built
 # first param is mpir directory
 
 SUCCESS=""
 HACK="echo 0"
+HACK2="echo 0"
 TLD=""
 DIR=$(pwd)
 if [ $# -eq 1 ] ; then 
@@ -11,8 +13,15 @@ if [ $# -eq 1 ] ; then
 	REL=$(echo $1 | cut -b 1)
 	if [ $REL == "/" ] ; then
 	       DIR=$1
+	       # if mingw then abort
+	       if [ $($DIR/config.guess | cut -f 3 -d -) == "mingw32" ] ; then
+	       	echo "ERROR mingw doesn't like absolute paths"
+		exit 1
+		fi
+
 	else
 	       DIR=$(pwd)/$1
+	       RDIR=$1
 	fi
 fi
 
@@ -33,6 +42,10 @@ if [ $SYSNAME == "mark" ] ; then
 	TCFLAGS=-O1
 	TCXXFLAGS=-O1
 	# only really need the flags for cc
+fi
+if [ $SYSNAME == "BOX1-WIN32" ] ; then
+	CPUS=8
+	# mingw cant detect cpus
 fi
 if [ $SYSNAME == "mark2" ] ; then
 	CPUS=2
@@ -89,9 +102,23 @@ SYS=$($DIR/config.guess | cut -f 1 -d -)
 if [ $(echo -e $FATCPU | grep -ce ^${SYS}\$) -eq 1 ] ; then FAT=1 ; echo "Using FAT" ; fi
 SYS=none-$($DIR/config.guess | cut -f 2- -d -)
 
+if [ $($DIR/config.guess | cut -f 3 -d -) == "cygwin" ] ; then
+	HACK2="cd yasm ; make"
+	# as yasm in cygwin doesn't like paralell builds
+fi
+
+CONFIG=$DIR/configure
+
+if [ $($DIR/config.guess | cut -f 3 -d -) == "mingw32" ] ; then
+	CONFIG=../$RDIR/configure
+	# mingw doest like configure run with an absolute path
+	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"
+	# mingw fail make check in yasm
+fi
+
 function build {
 echo -e "\n\n\nTrying $1 $2 $3\n\n\n"
-mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && export CXX=$2 && $DIR/configure $3 && make -j $CPUS && /bin/bash -c "$HACK" && \
+mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && export CXX=$2 && $CONFIG $3 && /bin/bash -c "$HACK2" && make -j $CPUS && /bin/bash -c "$HACK" && \
 	make -j $CPUS check && cd .. && rm -rf $SYSNAME
 if [ $? -ne 0 ] ; then echo -e "${SYSNAME}\n${SUCCESS}\nFAILED CC=$1 CXX=$2 configure=$3" ; exit 1 ; fi
 SUCCESS=$(echo -e "${SUCCESS}\nPASSED CC=$1 CXX=$2 configure=$3")
