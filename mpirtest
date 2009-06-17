@@ -102,23 +102,27 @@ SYS=$($DIR/config.guess | cut -f 1 -d -)
 if [ $(echo -e $FATCPU | grep -ce ^${SYS}\$) -eq 1 ] ; then FAT=1 ; echo "Using FAT" ; fi
 SYS=none-$($DIR/config.guess | cut -f 2- -d -)
 
+BUILDSHARED=0
 if [ $($DIR/config.guess | cut -f 3 -d -) == "cygwin" ] ; then
 	HACK2="cd yasm ; make"
 	# as yasm in cygwin doesn't like paralell builds
+	BUILDSHARED=1
 fi
 
 CONFIG=$DIR/configure
+SHE=/bin/bash
 
 if [ $($DIR/config.guess | cut -f 3 -d -) == "mingw32" ] ; then
 	CONFIG=../$RDIR/configure
 	# mingw doest like configure run with an absolute path
 	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"
 	# mingw fail make check in yasm
+	SHE=/bin/sh
 fi
 
 function build {
 echo -e "\n\n\nTrying $1 $2 $3\n\n\n"
-mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && export CXX=$2 && $CONFIG $3 && /bin/bash -c "$HACK2" && make -j $CPUS && /bin/bash -c "$HACK" && \
+mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && export CXX=$2 && $CONFIG $3 && $SHE -c "$HACK2" && make -j $CPUS && $SHE -c "$HACK" && \
 	make -j $CPUS check && cd .. && rm -rf $SYSNAME
 if [ $? -ne 0 ] ; then echo -e "${SYSNAME}\n${SUCCESS}\nFAILED CC=$1 CXX=$2 configure=$3" ; exit 1 ; fi
 SUCCESS=$(echo -e "${SUCCESS}\nPASSED CC=$1 CXX=$2 configure=$3")
@@ -155,6 +159,22 @@ do
 		build $C $CX "--enable-fat --enable-cxx --enable-gmpcompat"
 		# all features and debug
 		build $C $CX "--enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+	fi
+	if [ $BUILDSHARED -eq 1 ] ; then
+		#standard build
+		build $C $CX "--enable-shared --disable-static"
+		# all features
+		build $C $CX "--enable-shared --disable-static --enable-cxx --enable-gmpcompat"
+		# all features and debug
+		build $C $CX "--enable-shared --disable-static --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+		if [ $FAT -eq 1 ] ; then
+			# standard build
+			build $C $CX "--enable-shared --disable-static --enable-fat"
+			# all features
+			build $C $CX "--enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat"
+			# all features and debug
+			build $C $CX "--enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+		fi
 	fi
 done
 echo -e "${SYSNAME}\n$SUCCESS"
