@@ -1,7 +1,11 @@
 @echo off
-call "config_params.bat"
-if "%DONECONFIG%" == "no" goto :EOF
-call "%ProgramFiles%\Microsoft Visual Studio 9.0\VC\bin\vcvarsall.bat" %OS%
+if not exist config_params.bat (
+	echo run configure first
+	goto :EOF
+)
+call config_params.bat
+:: only really want to run this once as it keep appending to the path
+call %VCENV% %OS%
 if "%1" == ""        goto :make
 if "%1" == "clean"   goto :clean
 if "%1" == "install" goto :install
@@ -10,11 +14,11 @@ echo Unkwown option
 goto :EOF
 
 :make
-vcbuild gen-mpir\gen-mpir.vcproj "Release|%BIT%"
-vcbuild gen-bases\gen-bases.vcproj "Release|%BIT%"
-vcbuild gen-fac_ui\gen-fac_ui.vcproj "Release|%BIT%"
-vcbuild gen-fib\gen-fib.vcproj "Release|%BIT%"
-vcbuild gen-psqr\gen-psqr.vcproj "Release|%BIT%"
+vcbuild gen-mpir\gen-mpir.vcproj "Release|Win32"
+vcbuild gen-bases\gen-bases.vcproj "Release|Win32"
+vcbuild gen-fac_ui\gen-fac_ui.vcproj "Release|Win32%"
+vcbuild gen-fib\gen-fib.vcproj "Release|Win32"
+vcbuild gen-psqr\gen-psqr.vcproj "Release|Win32"
 set LIBBUILD=%LIBTYPE%_mpir_%CPU%
 vcbuild %LIBBUILD%\%LIBBUILD%.vcproj "Release|%BIT%"
 :: c++ to build  if static
@@ -36,8 +40,7 @@ goto :EOF
 goto :EOF
 
 :clean
-echo echo must run configure first > config_params.bat
-echo set DONECONFIG=no >> config_params.bat
+del config_params.bat
 goto :EOF
 
 :EOF
