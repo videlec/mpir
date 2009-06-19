@@ -6,7 +6,9 @@ set YASMEXE64="c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\yasm.ex
 set YASMEXE32="c:\Program Files\Microsoft Visual Studio 9.0\VC\bin\yasm.exe"
 if not exist %YASMEXE64% (
 	set VCPATH="c:\Program Files\Microsoft Visual Studio 9.0\VC"
-	set VCENV="c:\Program Files\Microsoft Visual Studio 9.0\VC\bin\vcvarsall.bat"
+	:: what happend to this file below???
+	::set VCENV="c:\Program Files\Microsoft Visual Studio 9.0\VC\bin\vcvarsall.bat"
+	set VCENV="c:\Program Files\Microsoft Visual Studio 9.0\VC\bin\vcvars32.bat"
 	if not exist %YASMEXE32% (
 		echo Error could not find %YASMEXE64%
 	        echo Error could not find %YASMEXE32%
