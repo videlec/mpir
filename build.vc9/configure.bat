@@ -3,10 +3,10 @@
 set VCPATH="c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC"
 set VCENV="c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars32.bat"
 set YASMEXE64="c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\yasm.exe"
+set YASMEXE32="c:\Program Files\Microsoft Visual Studio 9.0\VC\bin\yasm.exe"
 if not exist %YASMEXE64% (
 	set VCPATH="c:\Program Files\Microsoft Visual Studio 9.0\VC"
 	set VCENV="c:\Program Files\Microsoft Visual Studio 9.0\VC\bin\vcvarsall.bat"
-	set YASMEXE32="c:\Program Files\Microsoft Visual Studio 9.0\VC\bin\yasm.exe"
 	if not exist %YASMEXE32% (
 		echo Error could not find %YASMEXE64%
 	        echo Error could not find %YASMEXE32%
@@ -20,7 +20,7 @@ if not exist %YASMEXE64% (
 set LIBTYPE=lib
 set BIT=Win32
 set CPU=p3
-set OS=x86
+set JOS=x86
 :lp
 shift
 if "%0" == "" goto :exitlp
@@ -37,12 +37,12 @@ if "%0" == "amd64" ( set CPU=amd64)
 if "%0" == "core2" ( set CPU=core2)
 goto :lp
 :exitlp
-if %BIT% == Win32 ( set OS=x86)
-if %BIT% == x64 (set OS=x64)
+if %BIT% == Win32 ( set JOS=x86)
+if %BIT% == x64 (set JOS=x64)
 echo set LIBTYPE=%LIBTYPE%> config_params.bat
 echo set BIT=%BIT%>> config_params.bat
 echo set CPU=%CPU%>> config_params.bat
-echo set OS=%OS%>> config_params.bat
+echo set JOS=%JOS%>> config_params.bat
 echo set VCPATH=%VCPATH%>> config_params.bat
 echo set VCENV=%VCENV%>> config_params.bat
 echo setting params to

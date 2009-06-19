@@ -5,7 +5,7 @@ if not exist config_params.bat (
 )
 call config_params.bat
 :: only really want to run this once as it keep appending to the path
-call %VCENV% %OS%
+call %VCENV% %JOS%
 if "%1" == ""        goto :make
 if "%1" == "clean"   goto :clean
 if "%1" == "install" goto :install
