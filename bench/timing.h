@@ -52,10 +52,11 @@ cputime()
 inline int
 cputime ()
 {
-  struct rusage rus;
+  struct timeval tp;
+  struct timezone tzp;
 
-  getrusage (0, &rus);
-  return rus.ru_utime.tv_sec * 1000 + rus.ru_utime.tv_usec / 1000;
+  gettimeofday(&tp,&tzp);
+  return tp.tv_sec * 1000 + tp.tv_usec / 1000;
 }
 
 #endif
