@@ -1,5 +1,20 @@
 @echo off
-:: could copy this from mpir-distribution
+
+:: find a compiler
+cl config.guess.c > crap 2>&1
+if not errorlevel 1 goto :STEP2
+if exist %VS90COMNTOOLS%\..\..\VC\bin\vcvars32.bat (
+  call "%VS90COMNTOOLS%\..\..\VC\bin\vcvars32.bat"
+  cl config.guess.c > crap 2>&1
+  if not errorlevel 1 goto :STEP2
+)
+echo ERROR Cant find a working compiler
+goto :EOF
+:: found compiler and got config.guess.exe
+:STEP2
+
+
+:: check for yasm
 set VCPATH="c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC"
 set VCENV="c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars32.bat"
 set YASMEXE64="c:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\yasm.exe"
@@ -18,9 +33,16 @@ if not exist %YASMEXE64% (
 
 :: or does these need root access???? we can still check for existence
 :: copy yasm.rules "%VCPATH\VCProjectDefaults\yasm.rules"
+
 :: default is  32bit pentium3 static library
+config.guess.exe
+config.guess.exe var > config.guess.bat
+call config.guess.bat
+del config.guess.bat
 set LIBTYPE=lib
 set BIT=Win32
+if "%BITS%" == "32" ( set BIT=Win32)
+if "%BITS%" == "64" ( set BIT=x64)
 set CPU=p3
 set JOS=x86
 :lp
