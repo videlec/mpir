@@ -12,7 +12,7 @@
   char vendor_string[13];
   char features[12];
   long fms;
-  int family, model, stepping;
+  int family, model, stepping,feat;
   char *modelstr;
 
   __gmpn_cpuid (vendor_string, 0);
@@ -62,7 +62,7 @@
         #endif
         #if CONFIG_GUESS_32BIT || FAT32
 	  if (model <= 6) { CPUIS(pentium4);break;}
-	  int feat = ((int *)features)[2];
+	  feat = ((int *)features)[2];
           if (feat & 1) { CPUIS(prescott);break;}
         #endif
           break;
