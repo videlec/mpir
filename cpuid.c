@@ -58,7 +58,7 @@
         #if CONFIG_GUESS_64BIT || FAT64
           __gmpn_cpuid(features,0x80000001);
           if ( features[8]&1 ){ CPUIS(netburstlahf);break;}
-          CPUIS(netburst);
+          CPUIS(netburst);break;
         #endif
         #if CONFIG_GUESS_32BIT || FAT32
 	  if (model <= 6) { CPUIS(pentium4);break;}

@@ -18,5 +18,5 @@ main (int argc,char *argv[])
 #define FAT64			0
 #define INFAT			0
 #include "../cpuid.c"
-if(argc==2){printf("set CPU=%s\nset BITS=%d\n",modelstr,a);return 0;}
+if(argc==2){printf("set GCPU=%s\nset GBITS=%d\n",modelstr,a);return 0;}
 printf("%s-pc-Win%d\n",modelstr,a);return 0;}
