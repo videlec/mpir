@@ -86,18 +86,18 @@ if not exist %YASMRULES% (
 if %CPU% == ? (	set CPU=%GCPU%)
 set BCPU=none
 if %BITS% == 64 (
-	if %CPU% == x86_64 ( set BCPU=none)
+	if %CPU% == x86_64 ( set BCPU=gc)
 	if %CPU% == core2 ( set BCPU=core2)
 	if %CPU% == penryn ( set BCPU=core2)
 	if %CPU% == nehalem ( set BCPU=core2)
-	if %CPU% == atom ( set BCPU=none)
-	if %CPU% == netburst ( set BCPU=none)
-	if %CPU% == netburstlahf ( set BCPU=none)
+	if %CPU% == atom ( set BCPU=gc)
+	if %CPU% == netburst ( set BCPU=gc)
+	if %CPU% == netburstlahf ( set BCPU=gc)
 	if %CPU% == k8 ( set BCPU=amd64)
 	if %CPU% == k10 ( set BCPU=amd64)
 )
 if %BITS% == 32 (
-	if %CPU% == i486 ( set BCPU=none)
+	if %CPU% == i486 ( set BCPU=gc)
 	if %CPU% == pentium ( set BCPU=p0)
 	if %CPU% == pentiummmx ( set BCPU=p0)
 	if %CPU% == pentiumpro ( set BCPU=p0)
@@ -122,7 +122,7 @@ if %BITS% == 32 (
 	if %CPU% == viac3 ( set BCPU=p0)
 	if %CPU% == viac32 ( set BCPU=p0)
 )
-if %CPU% == none ( set BCPU=none)
+if %CPU% == none ( set BCPU=gc)
 echo Detected %GCPU%
 echo (set LIBTYPE=%LIBTYPE%) > config_params.bat
 echo (set ARCHW=%ARCHW%) >> config_params.bat
