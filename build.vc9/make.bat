@@ -18,7 +18,6 @@ vcbuild gen-fac_ui\gen-fac_ui.vcproj "Release|Win32%"
 vcbuild gen-fib\gen-fib.vcproj "Release|Win32"
 vcbuild gen-psqr\gen-psqr.vcproj "Release|Win32"
 set LIBBUILD=%LIBTYPE%_mpir_%BCPU%
-echo LIBBUILD is %LIBBUILD%
 vcbuild %LIBBUILD%\%LIBBUILD%.vcproj "Release|%ARCHW%"
 :: c++ to build  if static
 vcbuild lib_mpir_cpp\lib_mpir_cpp.vcproj "Release|%ARCHW%"
@@ -31,7 +30,22 @@ vcbuild mpir-tests.sln "Release|%ARCHW%"
 ::vcbuild /override:mpir-tests\test-config.vsprops mpir-tests\add-test-lib.vcproj "Release|%ARCHW%"
 ::vcbuild mpir-tests\add-test-lib.vcproj "Release|%ARCHW%"
 cd mpir-tests
-c:\python26\python.exe run-tests.py
+python --version >nul 2>&1
+if not errorlevel 1 goto :got
+if exist c:\Python26 (
+        set PATH=%PATH%;c:\Python26
+        python --version >nul 2>&1
+        if not errorlevel 1 goto :got
+)
+if exist c:\Python30 (
+        set PATH=%PATH%;c:\Python30
+        python --version >nul 2>&1
+        if not errorlevel 1 goto :got
+)
+echo ERROR Could not find PYTHON
+goto :EOF
+:got
+python run-tests.py
 cd ..
 goto :EOF
 
