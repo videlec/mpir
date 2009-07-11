@@ -8,6 +8,13 @@ if "%1" == ""        goto :make
 if "%1" == "clean"   goto :clean
 if "%1" == "install" goto :install
 if "%1" == "check"   goto :check
+if "%1" == "speed"   goto :speed
+if "%1" == "tune"    goto :speed
+if "%1" == "try"     goto :try
+if "%1" == "help" (
+	echo Usage : make [clean|install|check|speed|tune|try|help]
+	goto :EOF
+)
 echo Unkwown option
 goto :EOF
 
@@ -54,6 +61,16 @@ goto :EOF
 :install
 goto :EOF
 
+:speed
+vcbuild speed.sln "Release|%ARCHW%"
+echo tune.exe and speed.exe are in %ARCHW%\Release\
+goto :EOF
+
+:try
+vcbuild try\try.vcproj "Release|%ARCHW%"
+echo try.exe is in try\%ARCHW%\Release\
+goto :EOF
+
 :clean
 del config_params.bat config.guess.bat config.guess.exe config.guess.obj last_build.txt
 set LIBBUILD=%LIBTYPE%_mpir_%BCPU%
@@ -61,6 +78,7 @@ del /q/s gen-psqr\gen-psqr.exe gen-fac_ui\gen-fac_ui.exe gen-bases\gen-bases.exe
 del /q/s gen-fib\gen-fib.exe gen-mpir\gen-mpir.exe gen-mpir\gen-mpir.pdb
 rmdir /s/q x64 win32 %LIBBUILD%\%ARCHW% lib_mpir_cpp\%ARCHW% lib\%ARCHW% dll\%ARCHW% mpir-tests\%ARCHW%
 rmdir /s/q gen-psqr\%ARCHW% gen-fac_ui\%ARCHW% gen-bases\%ARCHW% gen-fib\%ARCHW% gen-mpir\%ARCHW%
+rmdir /s/q lib_speed\%ARCHW% speed\%ARCHW% tune\%ARCHW% try\%ARCHW%
 goto :EOF
 
 :EOF
