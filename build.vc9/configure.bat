@@ -53,8 +53,8 @@ if %BITS% == 64 (
 )
 cl config.guess.c > nul 2>&1
 if errorlevel 1 goto :nocc1
-config.guess.exe print > temp.bat
-call temp.bat
+config.guess.exe print > config.guess.bat
+call config.guess.bat
 if %GBITS% == %BITS% goto :gotcc
 :nocc1
 if exist "%VS90COMNTOOLS%\..\..\VC\vcvarsall.bat" (

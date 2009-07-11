@@ -20,7 +20,9 @@ vcbuild gen-psqr\gen-psqr.vcproj "Release|Win32"
 set LIBBUILD=%LIBTYPE%_mpir_%BCPU%
 vcbuild %LIBBUILD%\%LIBBUILD%.vcproj "Release|%ARCHW%"
 :: c++ to build  if static
-vcbuild lib_mpir_cpp\lib_mpir_cpp.vcproj "Release|%ARCHW%"
+if %LIBTYPE% == lib (
+	vcbuild lib_mpir_cpp\lib_mpir_cpp.vcproj "Release|%ARCHW%"
+)
 goto :EOF
 
 :check
@@ -53,7 +55,12 @@ goto :EOF
 goto :EOF
 
 :clean
-del config_params.bat
+del config_params.bat config.guess.bat config.guess.exe config.guess.obj last_build.txt
+set LIBBUILD=%LIBTYPE%_mpir_%BCPU%
+del /q/s gen-psqr\gen-psqr.exe gen-fac_ui\gen-fac_ui.exe gen-bases\gen-bases.exe
+del /q/s gen-fib\gen-fib.exe gen-mpir\gen-mpir.exe gen-mpir\gen-mpir.pdb
+rmdir /s/q x64 win32 %LIBBUILD%\%ARCHW% lib_mpir_cpp\%ARCHW% lib\%ARCHW% dll\%ARCHW% mpir-tests\%ARCHW%
+rmdir /s/q gen-psqr\%ARCHW% gen-fac_ui\%ARCHW% gen-bases\%ARCHW% gen-fib\%ARCHW% gen-mpir\%ARCHW%
 goto :EOF
 
 :EOF
