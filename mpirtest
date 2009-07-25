@@ -11,10 +11,10 @@ DIR=$(pwd)
 if [ $# -eq 1 ] ; then 
 	# get absolute directory
 	REL=$(echo $1 | cut -b 1)
-	if [ $REL == "/" ] ; then
+	if [ $REL = "/" ] ; then
 	       DIR=$1
 	       # if mingw then abort
-	       if [ $($DIR/config.guess | cut -f 3 -d -) == "mingw32" ] ; then
+	       if [ $($DIR/config.guess | cut -f 3 -d -) = "mingw32" ] ; then
 	       	echo "ERROR mingw doesn't like absolute paths"
 		exit 1
 		fi
@@ -36,61 +36,61 @@ COMP="gcc"
 if [ -f /proc/cpuinfo ] ; then
 	CPUS=$(cat /proc/cpuinfo  | grep -ce ^processor)
 fi
-if [ $SYSNAME == "mark" ] ; then
+if [ $SYSNAME = "mark" ] ; then
 	CPUS=2
 	COMP="gcc gcc-4.3.3 cc"
 	TCFLAGS=-O1
 	TCXXFLAGS=-O1
 	# only really need the flags for cc
 fi
-if [ $SYSNAME == "BOX1-WIN32" ] ; then
+if [ $SYSNAME = "BOX1-WIN32" ] ; then
 	CPUS=8
 	# mingw cant detect cpus
 fi
-if [ $SYSNAME == "mark2" ] ; then
+if [ $SYSNAME = "mark2" ] ; then
 	CPUS=2
 	COMP="gcc gcc-4.3.3 cc"
 	TCFLAGS=-O1
 	TCXXFLAGS=-O1
 fi
-if [ $SYSNAME == "t2" ] ; then
+if [ $SYSNAME = "t2" ] ; then
 	CPUS=8
 	COMP="gcc cc"
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/sparc-solaris-toolchain/lib/sparcv9
         TLD=/usr/ccs/bin/sparcv9/ld
 fi
-if [ $SYSNAME == "varro" ] ; then
+if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
 	COMP="gcc gcc-3.3"
 fi
-if [ $SYSNAME == "cleo" ] ; then
+if [ $SYSNAME = "cleo" ] ; then
 	COMP="gcc gcc-4.3.3"
 	#LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/intel-11.0.081/ia64-Linux-rhel/lib/ia64
 	#export LD_LIBRARY_PATH  dont know is we need this now
 	# cc=gcc-4.1.2 is broken on ia64
 	# icc is broken for the moment
 fi
-if [ $SYSNAME == "iras" ] ; then
+if [ $SYSNAME = "iras" ] ; then
 	COMP="gcc gcc-4.3.3"
 	# cc=gcc-4.1.2 is broken on ia64
 fi
-if [ $SYSNAME == "cicero" ] ; then
+if [ $SYSNAME = "cicero" ] ; then
 	COMP="gcc gcc-4.3.3 cc"
 fi
-if [ $SYSNAME == "menas" ] ; then
+if [ $SYSNAME = "menas" ] ; then
 	COMP="gcc gcc-4.3.3"
 fi
-if [ $SYSNAME == "fulvia" ] ; then
+if [ $SYSNAME = "fulvia" ] ; then
 	CPUS=4
 	COMP="gcc gcc-4.3.3 cc"
 	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"
 	TCFLAGS=-m64
 	TCXXFLAGS=-m64
 fi
-if [ $SYSNAME == "eno" ] ; then
+if [ $SYSNAME = "eno" ] ; then
 	COMP="gcc gcc-4.3.3 cc"
 fi
-if [ $SYSNAME == "modular" ] ; then
+if [ $SYSNAME = "modular" ] ; then
 	COMP="gcc"
 	# gcc-3.4 is broken on modular , has no g++
 fi
@@ -103,7 +103,7 @@ if [ $(echo -e $FATCPU | grep -ce ^${SYS}\$) -eq 1 ] ; then FAT=1 ; echo "Using 
 SYS=none-$($DIR/config.guess | cut -f 2- -d -)
 
 BUILDSHARED=0
-if [ $($DIR/config.guess | cut -f 3 -d -) == "cygwin" ] ; then
+if [ $($DIR/config.guess | cut -f 3 -d -) = "cygwin" ] ; then
 	HACK2="cd yasm ; make"
 	# as yasm in cygwin doesn't like paralell builds
 	BUILDSHARED=1
@@ -112,7 +112,7 @@ fi
 CONFIG=$DIR/configure
 SHE=/bin/bash
 
-if [ $($DIR/config.guess | cut -f 3 -d -) == "mingw32" ] ; then
+if [ $($DIR/config.guess | cut -f 3 -d -) = "mingw32" ] ; then
 	CONFIG=../$RDIR/configure
 	# mingw doest like configure run with an absolute path
 	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"
@@ -131,10 +131,10 @@ SUCCESS=$(echo -e "${SUCCESS}\nPASSED CC=$1 CXX=$2 configure=$3")
 for C in $COMP
 do
 	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/icpc/)
-	if [ $(uname) == "SunOS" ] ; then
+	if [ $(uname) = "SunOS" ] ; then
 		CX=$(echo $CX | sed s/c++/CC/)
 	fi
-	if [ $C == "cc" ] ; then
+	if [ $C = "cc" ] ; then
 		if [ -n $TLD ] ; then
 			export LD=$TLD
 		fi
