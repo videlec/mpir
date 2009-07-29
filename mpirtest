@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #    sh not bash for mingw
 # run this in the directory where everything will be built
 # first param is mpir directory
@@ -115,8 +115,6 @@ SHE=/bin/bash
 if [ $($DIR/config.guess | cut -f 3 -d -) = "mingw32" ] ; then
 	CONFIG=../$RDIR/configure
 	# mingw doest like configure run with an absolute path
-	HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"
-	# mingw fail make check in yasm
 	SHE=/bin/sh
 fi
 
