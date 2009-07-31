@@ -1,27 +1,24 @@
 @echo off
-pushd %1
-pushd build.vc9
-dir
+pushd %1\build.vc9
 
-configure.bat
-make
-make check
-make clean
+call configure
+call make
+call make check
+call make clean
 
-configure.bat --enable-shared
-make
-::make check    this is broken for now
-make clean
+call configure --enable-shared
+call make
+::call make check    this is broken for now
+call make clean
 
-configure.bat --cpu-none
-make
-make check
-make clean
+call configure --cpu-none
+call make
+call make check
+call make clean
 
-configure.bat --cpu-none --enable-shared
-make
-::make check    this is broken for now
-make clean
+call configure --cpu-none --enable-shared
+call make
+::call make check    this is broken for now
+call make clean
 
-popd
 popd
