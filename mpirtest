@@ -38,7 +38,7 @@ if [ -f /proc/cpuinfo ] ; then
 fi
 if [ $SYSNAME = "mark" ] ; then
 	CPUS=2
-	COMP="gcc gcc-4.3.3 cc"
+	COMP="gcc cc"
 	TCFLAGS=-O1
 	TCXXFLAGS=-O1
 	# only really need the flags for cc
@@ -49,7 +49,7 @@ if [ $SYSNAME = "BOX1-WIN32" ] ; then
 fi
 if [ $SYSNAME = "mark2" ] ; then
 	CPUS=2
-	COMP="gcc gcc-4.3.3 cc"
+	COMP="gcc cc"
 	TCFLAGS=-O1
 	TCXXFLAGS=-O1
 fi
@@ -64,31 +64,22 @@ if [ $SYSNAME = "varro" ] ; then
 	COMP="gcc gcc-3.3"
 fi
 if [ $SYSNAME = "cleo" ] ; then
-	COMP="gcc gcc-4.3.3"
 	#LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/intel-11.0.081/ia64-Linux-rhel/lib/ia64
 	#export LD_LIBRARY_PATH  dont know is we need this now
 	# cc=gcc-4.1.2 is broken on ia64
 	# icc is broken for the moment
 fi
-if [ $SYSNAME = "iras" ] ; then
-	COMP="gcc gcc-4.3.3"
-	# cc=gcc-4.1.2 is broken on ia64
-fi
 if [ $SYSNAME = "cicero" ] ; then
-	COMP="gcc gcc-4.3.3 cc"
-fi
-if [ $SYSNAME = "menas" ] ; then
-	COMP="gcc gcc-4.3.3"
+	COMP="gcc cc"
 fi
 if [ $SYSNAME = "fulvia" ] ; then
 	CPUS=4
 	COMP="gcc gcc-4.3.3 cc"
-	#HACK="echo -e \"check:\n\techo skip yasm check\n\" > yasm/Makefile"   		NOW FIXED in latest yasm
 	TCFLAGS=-m64
 	TCXXFLAGS=-m64
 fi
 if [ $SYSNAME = "eno" ] ; then
-	COMP="gcc gcc-4.3.3 cc"
+	COMP="gcc cc"
 fi
 if [ $SYSNAME = "modular" ] ; then
 	COMP="gcc"
@@ -96,7 +87,7 @@ if [ $SYSNAME = "modular" ] ; then
 fi
 echo "Using $CPUS cpus"
 
-FATCPU="x86_64\ni486\npentium\npentiummmx\npentiumpro\npentium2\npentium3\ncore\ncore2\npenryn\nnehalem\natom\nnetburst\nnetburtslahf\npentium4\nprescott\nk5\nk6\nk62\nk63\nk7\nk8\nk10\nviac3\nviac32"
+FATCPU="x86_64\ni486\npentium\npentiummmx\npentiumpro\npentium2\npentium3\ncore\ncore2\npenryn\nnehalem\natom\nnetburst\nnetburtslahf\npentium4\nprescott\nk5\nk6\nk62\nk63\nk7\nk8\nk10\nviac3\nviac32\nnano\nk102"
 FAT=0
 SYS=$($DIR/config.guess | cut -f 1 -d -)
 if [ $(echo -e $FATCPU | grep -c ^${SYS}\$) -eq 1 ] ; then FAT=1 ; echo "Using FAT" ; fi
@@ -174,6 +165,12 @@ do
 			build $C $CX "--enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 		fi
 	fi
+done
+uname -a
+${DIR}/config.guess
+for C in $COMP
+do
+	$C -v
 done
 echo -e "${SYSNAME}\n$SUCCESS"
 # try build try 
