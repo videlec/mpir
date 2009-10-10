@@ -63,12 +63,6 @@ if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
 	COMP="gcc gcc-3.3"
 fi
-if [ $SYSNAME = "cleo" ] ; then
-	#LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/intel-11.0.081/ia64-Linux-rhel/lib/ia64
-	#export LD_LIBRARY_PATH  dont know is we need this now
-	# cc=gcc-4.1.2 is broken on ia64
-	# icc is broken for the moment
-fi
 if [ $SYSNAME = "cicero" ] ; then
 	COMP="gcc cc"
 fi
