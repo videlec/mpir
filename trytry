@@ -12,7 +12,11 @@ do
 		mpn_mul_2 mpn_divexact_byBm1of mpn_divrem_euclidean_qr_1 mpn_divrem_euclidean_r_1 mpn_lshift2 mpn_rshift2 \
 		mpn_divrem_1 mpn_mod_1 mpn_sb_divrem_mn mpn_store MPN_ZERO
 if [ $? -ne 0 ] ; then exit 1 ; fi
-./try -R -s 1-50 -r 1 mpn_mul_basecase mpn_redc_basecase mpn_tdiv_qr
+./try -R -r1 mpn_divrem_hensel_qr_1 mpn_divrem_hensel_qr_1_1 mpn_divrem_hensel_qr_1_2 mpn_divrem_hensel_r_1 mpn_mod_1 mpn_divrem_1 
+if [ $? -ne 0 ] ; then exit 1 ; fi
+./try -R -s 1-50 -r 1 mpn_mul_basecase mpn_redc_basecase
+if [ $? -ne 0 ] ; then exit 1 ; fi
+./try -R -s 1-30 -r 1 mpn_tdiv_qr mpn_rsh_divrem_hensel_qr_1 mpn_rsh_divrem_hensel_qr_1_1 mpn_rsh_divrem_hensel_qr_1_2 mpn_divrem_hensel_rsh_qr_1 
 if [ $? -ne 0 ] ; then exit 1 ; fi
 ./try -R -s 1-$LIM -r 1 mpn_sqr_basecase
 if [ $? -ne 0 ] ; then exit 1 ; fi
