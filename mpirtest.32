@@ -1,0 +1,166 @@
+#!/bin/bash
+#    sh not bash for mingw
+# run this in the directory where everything will be built
+# first param is mpir directory
+
+SUCCESS=""
+HACK="echo 0"
+HACK2="echo 0"
+TLD=""
+DIR=$(pwd)
+if [ $# -eq 1 ] ; then 
+	# get absolute directory
+	REL=$(echo $1 | cut -b 1)
+	if [ $REL = "/" ] ; then
+	       DIR=$1
+	       # if mingw then abort
+	       if [ $($DIR/config.guess | cut -f 3 -d -) = "mingw32" ] ; then
+	       	echo "ERROR mingw doesn't like absolute paths"
+		exit 1
+		fi
+
+	else
+	       DIR=$(pwd)/$1
+	       RDIR=$1
+	fi
+fi
+
+# dont want to run yacc
+touch $DIR/demos/calc/*.c $DIR/demos/calc/*.h
+
+SYSNAME=$(uname -n)
+if [ -e $SYSNAME ] ; then echo "ERROR directory $SYSNAME allready exist" ; exit 1 ; fi
+
+CPUS=1
+COMP="gcc"
+if [ -f /proc/cpuinfo ] ; then
+	CPUS=$(cat /proc/cpuinfo  | grep -ce ^processor)
+fi
+if [ $SYSNAME = "mark" ] ; then
+	CPUS=2
+	COMP="gcc cc"
+	TCFLAGS=-O1
+	TCXXFLAGS=-O1
+	# only really need the flags for cc
+fi
+if [ $SYSNAME = "BOX1-WIN32" ] ; then
+	CPUS=8
+	# mingw cant detect cpus
+fi
+if [ $SYSNAME = "mark2" ] ; then
+	CPUS=2
+	COMP="gcc cc"
+	TCFLAGS=-O1
+	TCXXFLAGS=-O1
+fi
+if [ $SYSNAME = "t2" ] ; then
+	CPUS=8
+	COMP="gcc cc"
+	#LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/sparc-solaris-toolchain/lib/sparcv9
+        #TLD=/usr/ccs/bin/sparcv9/ld
+fi
+if [ $SYSNAME = "varro" ] ; then
+	CPUS=2
+	COMP="gcc gcc-3.3"
+fi
+if [ $SYSNAME = "cicero" ] ; then
+	COMP="gcc cc"
+fi
+if [ $SYSNAME = "fulvia" ] ; then
+	CPUS=4
+	COMP="gcc cc"
+	TCFLAGS=-m64
+	TCXXFLAGS=-m64
+fi
+if [ $SYSNAME = "eno" ] ; then
+	COMP="gcc cc"
+fi
+echo "Using $CPUS cpus"
+
+FATCPU="x86_64\ni486\npentium\npentiummmx\npentiumpro\npentium2\npentium3\ncore\ncore2\npenryn\nnehalem\natom\nnetburst\nnetburtslahf\npentium4\nprescott\nk5\nk6\nk62\nk63\nk7\nk8\nk10\nviac3\nviac32\nnano\nk102"
+FAT=0
+SYS=$($DIR/config.guess | cut -f 1 -d -)
+if [ $(echo -e $FATCPU | grep -c ^${SYS}\$) -eq 1 ] ; then FAT=1 ; echo "Using FAT" ; fi
+SYS=long-$($DIR/config.guess | cut -f 2- -d -)
+
+BUILDSHARED=0
+if [ $($DIR/config.guess | cut -f 3 -d -) = "cygwin" ] ; then
+	HACK2="cd yasm ; make"
+	# as yasm in cygwin doesn't like paralell builds
+	BUILDSHARED=1
+fi
+
+CONFIG=$DIR/configure
+SHE=/bin/bash
+
+if [ $($DIR/config.guess | cut -f 3 -d -) = "mingw32" ] ; then
+	CONFIG=../$RDIR/configure
+	# mingw doest like configure run with an absolute path
+	SHE=/bin/sh
+fi
+
+function build {
+echo -e "\n\n\nTrying $1 $2 $3\n\n\n"
+mkdir $SYSNAME && cd $SYSNAME && export CC=$1 && export CXX=$2 && $CONFIG $3 && $SHE -c "$HACK2" && make -j $CPUS && $SHE -c "$HACK" && \
+	make -j $CPUS check && cd .. && rm -rf $SYSNAME
+if [ $? -ne 0 ] ; then echo -e "${SYSNAME}\n${SUCCESS}\nFAILED CC=$1 CXX=$2 configure=$3" ; exit 1 ; fi
+SUCCESS=$(echo -e "${SUCCESS}\nPASSED CC=$1 CXX=$2 configure=$3")
+}
+
+for C in $COMP
+do
+	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/icpc/)
+	if [ $(uname) = "SunOS" ] ; then
+		CX=$(echo $CX | sed s/c++/CC/)
+	fi
+	if [ $C = "cc" ] ; then
+		if [ -n $TLD ] ; then
+			export LD=$TLD
+		fi
+		# it would be nice if we set this back on exit
+	fi
+	# standard build
+	build $C $CX "ABI=32"
+	# all features
+	build $C $CX "ABI=32 --enable-cxx --enable-gmpcompat"
+	# all features and debug
+	build $C $CX "ABI=32 --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+	# maximum debug
+	export CFLAGS=$TCFLAGS
+	export CXXFLAGS=$TCXXFLAGS
+	build $C $CX "ABI=32 --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=$SYS"
+	unset CFLAGS
+	unset CXXFLAGS
+	if [ $FAT -eq 1 ] ; then
+		# standard build
+		build $C $CX "ABI=32 --enable-fat"
+		# all features
+		build $C $CX "ABI=32 --enable-fat --enable-cxx --enable-gmpcompat"
+		# all features and debug
+		build $C $CX "ABI=32 --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+	fi
+	if [ $BUILDSHARED -eq 1 ] ; then
+		#standard build
+		build $C $CX "ABI=32 --enable-shared --disable-static"
+		# all features
+		build $C $CX "ABI=32 --enable-shared --disable-static --enable-cxx --enable-gmpcompat"
+		# all features and debug
+		build $C $CX "ABI=32 --enable-shared --disable-static --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+		if [ $FAT -eq 1 ] ; then
+			# standard build
+			build $C $CX "ABI=32 --enable-shared --disable-static --enable-fat"
+			# all features
+			build $C $CX "ABI=32 --enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat"
+			# all features and debug
+			build $C $CX "ABI=32 --enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+		fi
+	fi
+done
+uname -a
+${DIR}/config.guess
+for C in $COMP
+do
+	$C -v
+done
+echo -e "${SYSNAME}\n$SUCCESS"
+# try build try 
