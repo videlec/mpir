@@ -88,6 +88,7 @@ if [ $($DIR/config.guess | cut -f 3 -d -) = "cygwin" ] ; then
 	HACK2="cd yasm ; make"
 	# as yasm in cygwin doesn't like paralell builds
 	BUILDSHARED=1
+	COMP="gcc gcc-4"
 fi
 
 CONFIG=$DIR/configure
