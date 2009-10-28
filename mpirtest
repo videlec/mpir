@@ -55,20 +55,23 @@ if [ $SYSNAME = "mark2" ] ; then
 fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=8
-	COMP="gcc cc"
+	COMP="gcc"
+	# where is cc
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/sparc-solaris-toolchain/lib/sparcv9
         TLD=/usr/ccs/bin/sparcv9/ld
 fi
 if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
-	COMP="gcc gcc-3.3"
+	COMP="gcc"
+	# gcc-3.3 is broken with c++
 fi
 if [ $SYSNAME = "cicero" ] ; then
 	COMP="gcc cc"
 fi
 if [ $SYSNAME = "fulvia" ] ; then
 	CPUS=4
-	COMP="gcc cc"
+	COMP="gcc"
+	# cc broken at the mo
 	TCFLAGS=-m64
 	TCXXFLAGS=-m64
 fi
