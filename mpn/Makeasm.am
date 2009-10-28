@@ -45,7 +45,7 @@ PREPROCESS_FLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 # remains ahead of .s, perhaps because .c.s is a builtin rule.  .asm works
 # fine though, and mpn/mips3 uses this.
 #
-SUFFIXES = .s .S .as .asm .cu
+SUFFIXES = .cu .s .S .as .asm 
 
 
 # .s assembler, no preprocessing.

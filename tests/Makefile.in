@@ -334,7 +334,7 @@ PREPROCESS_FLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 # remains ahead of .s, perhaps because .c.s is a builtin rule.  .asm works
 # fine though, and mpn/mips3 uses this.
 #
-SUFFIXES = .s .S .as .asm .cu
+SUFFIXES = .cu .s .S .as .asm 
 
 # can be overridden during development, eg. "make RM_TMP=: mul_1.lo"
 RM_TMP = rm -f
@@ -351,7 +351,7 @@ TESTS = $(check_PROGRAMS)
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .s .S .as .asm .cu .c .lo .o .obj
+.SUFFIXES: .cu .s .S .as .asm .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../mpn/Makeasm.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
