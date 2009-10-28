@@ -1420,7 +1420,7 @@ case $host in
         gcc_cflags_cpu="-mtune=c3 -mcpu=c3 -mcpu=i486 -m486"
         gcc_cflags_arch="-march=c3 -march=pentium-mmx -march=pentium"
         ;;
-      x86_64 | k8 | k10 | k102 | atom)
+      cuda | x86_64 | k8 | k10 | k102 | atom)
         gcc_cflags_cpu="-mtune=k8 -mcpu=athlon -mcpu=pentiumpro -mcpu=i486 -m486"
         gcc_cflags_arch="-march=k8 -march=k8~-mno-sse2 -march=athlon -march=pentiumpro -march=pentium"
         ;;
@@ -1530,6 +1530,8 @@ case $host in
             path_64="x86_64/atom x86_64" ;;
           nano-*-*) 
             path_64="x86_64/nano x86_64" ;;
+	  cuda-*-*) 
+            path_64="cuda x86_64/k8/k10 x86_64/k8 x86_64" ;;	 
         esac
 
         # If the user asked for a fat build, override the path set above
