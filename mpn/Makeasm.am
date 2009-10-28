@@ -114,5 +114,5 @@ RM_TMP = rm -f
 	$(LIBTOOL) --mode=compile --tag=CC $(top_srcdir)/strip_fPIC.sh $(top_builddir)$(MPIR_AS) -I $(top_builddir) $(OBJECT_FORMAT) $(GSYM_FLAG) -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 .cu.lo:
-	$(LIBTOOL) --mode=compile --tag=CC nvcc -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+	$(LIBTOOL) --mode=compile --tag=CC nvcc -c -I /usr/local/cuda_sdk/common/inc/ -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
