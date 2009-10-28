@@ -269,7 +269,7 @@ noinst_LTLIBRARIES = libmpn.la
 nodist_libmpn_la_SOURCES = fib_table.c mp_bases.c
 libmpn_la_LIBADD = $(OFILES)
 libmpn_la_DEPENDENCIES = $(OFILES)
-TARG_DIST = a29k alpha arm clipper cray generic i960 ia64 lisp m68k \
+TARG_DIST = a29k alpha arm clipper cuda cray generic i960 ia64 lisp m68k \
   m88k mips32 mips64 ns32k pa32 pa64 power powerpc32 powerpc64 pyr s390 sh \
   sparc32 sparc64 thumb vax x86 x86_64 z8000 z8000x
 
@@ -297,14 +297,14 @@ PREPROCESS_FLAGS = $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 # remains ahead of .s, perhaps because .c.s is a builtin rule.  .asm works
 # fine though, and mpn/mips3 uses this.
 #
-SUFFIXES = .s .S .as .asm
+SUFFIXES = .s .S .as .asm .cu
 
 # can be overridden during development, eg. "make RM_TMP=: mul_1.lo"
 RM_TMP = rm -f
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .s .S .as .asm .c .lo .o .obj
+.SUFFIXES: .s .S .as .asm .cu .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/Makeasm.am $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -606,6 +606,9 @@ perfsqr.h:
 
 .as.lo:
 	$(LIBTOOL) --mode=compile --tag=CC $(top_srcdir)/strip_fPIC.sh $(top_builddir)$(MPIR_AS) -I $(top_builddir) $(OBJECT_FORMAT) $(GSYM_FLAG) -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+.cu.lo:
+	$(LIBTOOL) --mode=compile --tag=CC nvcc -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
