@@ -29570,7 +29570,7 @@ esac
 
 
       for tmp_base in $tmp_fn $tmp_mulfunc; do
-        for tmp_ext in as asm S s c; do
+        for tmp_ext in as asm S s cu c; do
           tmp_file=$srcdir/mpn/$tmp_dir/$tmp_base.$tmp_ext
           if test -f $tmp_file; then
 
@@ -29690,12 +29690,12 @@ fi
 # Normal binary setups.
 #
 
-for tmp_ext in as asm S s c; do
+for tmp_ext in as asm S s cu c; do
   eval found_$tmp_ext=no
 done
 
 for tmp_fn in $gmp_mpn_functions; do
-  for tmp_ext in as asm S s c; do
+  for tmp_ext in as asm S s cu c; do
     test "$no_create" = yes || rm -f mpn/$tmp_fn.$tmp_ext
   done
 
@@ -29729,7 +29729,7 @@ esac
   found=no
   for tmp_dir in $path; do
     for tmp_base in $tmp_fn $tmp_mulfunc; do
-      for tmp_ext in as asm S s c; do
+      for tmp_ext in as asm S s cu c; do
         tmp_file=$srcdir/mpn/$tmp_dir/$tmp_base.$tmp_ext
         if test -f $tmp_file; then
 

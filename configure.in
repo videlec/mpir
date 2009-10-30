@@ -2555,7 +2555,7 @@ case $srcdir in
 esac
 
 
-define(MPN_SUFFIXES,[as asm S s c])
+define(MPN_SUFFIXES,[as asm S s cu c])
 
 dnl  Usage: GMP_FILE_TO_FUNCTION_BASE(func,file)
 dnl
