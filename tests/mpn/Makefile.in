@@ -86,143 +86,171 @@ am__st_fat_SOURCES_DIST = t-fat.c
 st_fat_OBJECTS = $(am_st_fat_OBJECTS)
 st_fat_LDADD = $(LDADD)
 st_fat_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 am__st_instrument_SOURCES_DIST = t-instrument.c
 @ENABLE_SHARED_TRUE@@ENABLE_STATIC_TRUE@am_st_instrument_OBJECTS = t-instrument.$(OBJEXT)
 st_instrument_OBJECTS = $(am_st_instrument_OBJECTS)
 st_instrument_LDADD = $(LDADD)
 st_instrument_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_addadd_n_SOURCES = t-addadd_n.c
 t_addadd_n_OBJECTS = t-addadd_n.$(OBJEXT)
 t_addadd_n_LDADD = $(LDADD)
 t_addadd_n_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_addsub_n_SOURCES = t-addsub_n.c
 t_addsub_n_OBJECTS = t-addsub_n.$(OBJEXT)
 t_addsub_n_LDADD = $(LDADD)
 t_addsub_n_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_aors_1_SOURCES = t-aors_1.c
 t_aors_1_OBJECTS = t-aors_1.$(OBJEXT)
 t_aors_1_LDADD = $(LDADD)
 t_aors_1_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_asmtype_SOURCES = t-asmtype.c
 t_asmtype_OBJECTS = t-asmtype.$(OBJEXT)
 t_asmtype_LDADD = $(LDADD)
 t_asmtype_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_dc_divappr_q_n_SOURCES = t-dc_divappr_q_n.c
 t_dc_divappr_q_n_OBJECTS = t-dc_divappr_q_n.$(OBJEXT)
 t_dc_divappr_q_n_LDADD = $(LDADD)
 t_dc_divappr_q_n_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_divebyBm1of_SOURCES = t-divebyBm1of.c
 t_divebyBm1of_OBJECTS = t-divebyBm1of.$(OBJEXT)
 t_divebyBm1of_LDADD = $(LDADD)
 t_divebyBm1of_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_divebyff_SOURCES = t-divebyff.c
 t_divebyff_OBJECTS = t-divebyff.$(OBJEXT)
 t_divebyff_LDADD = $(LDADD)
 t_divebyff_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_divrem_1_SOURCES = t-divrem_1.c
 t_divrem_1_OBJECTS = t-divrem_1.$(OBJEXT)
 t_divrem_1_LDADD = $(LDADD)
 t_divrem_1_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_fat_SOURCES = t-fat.c
 t_fat_OBJECTS = t-fat.$(OBJEXT)
 t_fat_LDADD = $(LDADD)
 t_fat_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_get_d_SOURCES = t-get_d.c
 t_get_d_OBJECTS = t-get_d.$(OBJEXT)
 t_get_d_LDADD = $(LDADD)
 t_get_d_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_instrument_SOURCES = t-instrument.c
 t_instrument_OBJECTS = t-instrument.$(OBJEXT)
 t_instrument_LDADD = $(LDADD)
 t_instrument_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_iord_u_SOURCES = t-iord_u.c
 t_iord_u_OBJECTS = t-iord_u.$(OBJEXT)
 t_iord_u_LDADD = $(LDADD)
 t_iord_u_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_lorrshift1_SOURCES = t-lorrshift1.c
 t_lorrshift1_OBJECTS = t-lorrshift1.$(OBJEXT)
 t_lorrshift1_LDADD = $(LDADD)
 t_lorrshift1_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_mp_bases_SOURCES = t-mp_bases.c
 t_mp_bases_OBJECTS = t-mp_bases.$(OBJEXT)
 t_mp_bases_LDADD = $(LDADD)
 t_mp_bases_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_mullow_basecase_SOURCES = t-mullow_basecase.c
 t_mullow_basecase_OBJECTS = t-mullow_basecase.$(OBJEXT)
 t_mullow_basecase_LDADD = $(LDADD)
 t_mullow_basecase_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_mullowhigh_SOURCES = t-mullowhigh.c
 t_mullowhigh_OBJECTS = t-mullowhigh.$(OBJEXT)
 t_mullowhigh_LDADD = $(LDADD)
 t_mullowhigh_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_mulmid_SOURCES = t-mulmid.c
 t_mulmid_OBJECTS = t-mulmid.$(OBJEXT)
 t_mulmid_LDADD = $(LDADD)
 t_mulmid_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_mulmod_2expm1_SOURCES = t-mulmod_2expm1.c
 t_mulmod_2expm1_OBJECTS = t-mulmod_2expm1.$(OBJEXT)
 t_mulmod_2expm1_LDADD = $(LDADD)
 t_mulmod_2expm1_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_mulmod_2expp1_SOURCES = t-mulmod_2expp1.c
 t_mulmod_2expp1_OBJECTS = t-mulmod_2expp1.$(OBJEXT)
 t_mulmod_2expp1_LDADD = $(LDADD)
 t_mulmod_2expp1_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_neg_SOURCES = t-neg.c
 t_neg_OBJECTS = t-neg.$(OBJEXT)
 t_neg_LDADD = $(LDADD)
 t_neg_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_perfsqr_SOURCES = t-perfsqr.c
 t_perfsqr_OBJECTS = t-perfsqr.$(OBJEXT)
 t_perfsqr_LDADD = $(LDADD)
 t_perfsqr_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_redc_basecase_SOURCES = t-redc_basecase.c
 t_redc_basecase_OBJECTS = t-redc_basecase.$(OBJEXT)
 t_redc_basecase_LDADD = $(LDADD)
 t_redc_basecase_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_sb_divappr_q_SOURCES = t-sb_divappr_q.c
 t_sb_divappr_q_OBJECTS = t-sb_divappr_q.$(OBJEXT)
 t_sb_divappr_q_LDADD = $(LDADD)
 t_sb_divappr_q_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_scan_SOURCES = t-scan.c
 t_scan_OBJECTS = t-scan.$(OBJEXT)
 t_scan_LDADD = $(LDADD)
 t_scan_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_subadd_n_SOURCES = t-subadd_n.c
 t_subadd_n_OBJECTS = t-subadd_n.$(OBJEXT)
 t_subadd_n_LDADD = $(LDADD)
 t_subadd_n_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 t_tdiv_q_SOURCES = t-tdiv_q.c
 t_tdiv_q_OBJECTS = t-tdiv_q.$(OBJEXT)
 t_tdiv_q_LDADD = $(LDADD)
 t_tdiv_q_DEPENDENCIES = $(top_builddir)/tests/libtests.la \
-	$(top_builddir)/libmpir.la
+	$(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so \
+	/usr/lib/libcuda.so
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp =
 am__depfiles_maybe =
@@ -406,7 +434,7 @@ subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/tests
-LDADD = $(top_builddir)/tests/libtests.la $(top_builddir)/libmpir.la
+LDADD = $(top_builddir)/tests/libtests.la $(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so /usr/lib/libcuda.so
 @ENABLE_SHARED_TRUE@@ENABLE_STATIC_TRUE@st_fat_SOURCES = t-fat.c
 @ENABLE_SHARED_TRUE@@ENABLE_STATIC_TRUE@st_fat_LDFLAGS = -static
 @ENABLE_SHARED_TRUE@@ENABLE_STATIC_TRUE@st_instrument_SOURCES = t-instrument.c

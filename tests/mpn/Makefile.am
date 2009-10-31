@@ -21,7 +21,7 @@
 
 
 INCLUDES = -I$(top_srcdir) -I$(top_srcdir)/tests
-LDADD = $(top_builddir)/tests/libtests.la $(top_builddir)/libmpir.la
+LDADD = $(top_builddir)/tests/libtests.la $(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so /usr/lib/libcuda.so
 
 check_PROGRAMS = t-asmtype t-aors_1 t-divrem_1 t-fat t-get_d \
   t-instrument t-iord_u t-mulmid t-mp_bases t-perfsqr t-scan \

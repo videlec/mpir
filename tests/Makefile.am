@@ -25,7 +25,7 @@ SUBDIRS = . devel mpn mpz mpq mpf rand misc cxx
 include ../mpn/Makeasm.am
 
 INCLUDES = -I$(top_srcdir)
-LDADD = libtests.la $(top_builddir)/libmpir.la
+LDADD = libtests.la $(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so /usr/lib/libcuda.so
 
 check_LTLIBRARIES = libtests.la
 
@@ -33,7 +33,7 @@ EXTRA_libtests_la_SOURCES = x86_64call.as x86_64check.c x86call.asm x86check.c
 libtests_la_SOURCES = tests.h \
   memory.c misc.c refmpf.c refmpn.c refmpq.c refmpz.c spinner.c trace.c
 libtests_la_DEPENDENCIES = @CALLING_CONVENTIONS_OBJS@
-libtests_la_LIBADD = $(libtests_la_DEPENDENCIES) $(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so
+libtests_la_LIBADD = $(libtests_la_DEPENDENCIES) $(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so /usr/lib/libcuda.so
 
 check_PROGRAMS = t-bswap t-constants t-count_zeros t-gmpmax t-hightomask \
   t-modlinv t-popc t-parity t-sub
