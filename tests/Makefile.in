@@ -346,7 +346,7 @@ libtests_la_SOURCES = tests.h \
   memory.c misc.c refmpf.c refmpn.c refmpq.c refmpz.c spinner.c trace.c
 
 libtests_la_DEPENDENCIES = @CALLING_CONVENTIONS_OBJS@
-libtests_la_LIBADD = $(libtests_la_DEPENDENCIES) $(top_builddir)/libmpir.la
+libtests_la_LIBADD = $(libtests_la_DEPENDENCIES) $(top_builddir)/libmpir.la /usr/local/cuda/lib/libcudart.so
 TESTS = $(check_PROGRAMS)
 all: all-recursive
 
