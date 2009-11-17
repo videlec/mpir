@@ -2394,10 +2394,15 @@ mpn_mul_fft_full_a (mp_ptr op,
 	  a--;
   } 
 
-  muh = mpn_mul_fft (op, h, n, nl, m, ml, k2); /* mu = muh+{op,h} */
-
   tp = __GMP_ALLOCATE_FUNC_LIMBS (l);
-  mpn_mul_fft_mersenne (tp, l, n, nl, m, ml, k1); /* B */
+  
+#pragma omp parallel sections
+  {
+#pragma omp section
+	  muh = mpn_mul_fft (op, h, n, nl, m, ml, k2); /* mu = muh+{op,h} */
+#pragma omp section
+     mpn_mul_fft_mersenne (tp, l, n, nl, m, ml, k1); /* B */
+  }
 
   /* now compute B-A mod 2^N-1, where B = {tp, l}, and A = cc + {op, h} */
   for (cc = muh, i = 0; i < a; i++)

@@ -55,7 +55,7 @@ default=false
 
 if [ -z "$CFLAGS" ]
   then
-    CFLAGS="-O2 -fomit-frame-pointer -I$MPIR_DIR -include ${MPIR_NAME}.h"
+    CFLAGS="-O2 -fopenmp -fomit-frame-pointer -lpthread -I$MPIR_DIR -include ${MPIR_NAME}.h"
     echo "Using default CFLAGS = \"$CFLAGS\""
     default=true
   else
@@ -96,7 +96,7 @@ $CC $CFLAGS divide.c -o divide $LIBS || die "error compiling divide"
 $CC $CFLAGS rsa.c -o rsa $LIBS || die "error compiling rsa"
 
 
-multiply_args="128,128 512,512 8192,8192 131072,131072 2097152,2097152"
+multiply_args="128,128 512,512 8192,8192 6400,6400 19200,19200 64000,64000 131072,131072 192000,192000 640000,640000 2097152,2097152 6400000,6400000 19200000,19200000"
 divide_args="8192,32 8192,64 8192,128 8192,4096 8192,8064 131072,8192 131072,65536 8388608,4194304"
 rsa_args="512 1024 2048"
 

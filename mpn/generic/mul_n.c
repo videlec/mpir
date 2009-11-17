@@ -41,7 +41,7 @@ MA 02110-1301, USA. */
  */
 
 void
-mpn_kara_mul_n (mp_ptr p, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_ptr ws)
+mpn_kara_mul_int_n (mp_ptr p, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_ptr ws)
 {
   mp_limb_t w, w0, w1,c;
   mp_size_t n2;
@@ -126,16 +126,16 @@ mpn_kara_mul_n (mp_ptr p, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_ptr ws)
 	    }
 	  else
 	    {
-	      mpn_kara_mul_n (ws, p, p + n3, n3, ws + n1);
-	      mpn_kara_mul_n (p, a, b, n3, ws + n1);
+	      mpn_kara_mul_int_n (ws, p, p + n3, n3, ws + n1);
+	      mpn_kara_mul_int_n (p, a, b, n3, ws + n1);
 	    }
 	  mpn_mul_basecase (p + n1, a + n3, n2, b + n3, n2);
 	}
       else
 	{
-	  mpn_kara_mul_n (ws, p, p + n3, n3, ws + n1);
-	  mpn_kara_mul_n (p, a, b, n3, ws + n1);
-	  mpn_kara_mul_n (p + n1, a + n3, b + n3, n2, ws + n1);
+	  mpn_kara_mul_int_n (ws, p, p + n3, n3, ws + n1);
+	  mpn_kara_mul_int_n (p, a, b, n3, ws + n1);
+	  mpn_kara_mul_int_n (p + n1, a + n3, b + n3, n2, ws + n1);
 	}
 
       nm1 = n - 1;
@@ -235,9 +235,9 @@ mpn_kara_mul_n (mp_ptr p, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_ptr ws)
 	}
       else
 	{
-	  mpn_kara_mul_n (ws, p, p + n2, n2, ws + n);
-	  mpn_kara_mul_n (p, a, b, n2, ws + n);
-	  mpn_kara_mul_n (p + n, a + n2, b + n2, n2, ws + n);
+	  mpn_kara_mul_int_n (ws, p, p + n2, n2, ws + n);
+	  mpn_kara_mul_int_n (p, a, b, n2, ws + n);
+	  mpn_kara_mul_int_n (p + n, a + n2, b + n2, n2, ws + n);
 	}
 
       /* Interpolate. */
@@ -264,6 +264,109 @@ mpn_kara_mul_n (mp_ptr p, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_ptr ws)
       w += mpn_add_n (p + n2, p + n2, ws, n);
       MPN_INCR_U (p + n2 + n, 2 * n - (n2 + n), w);
     }
+}
+
+void
+mpn_kara_mul_n (mp_ptr p, mp_srcptr a,
+		          mp_srcptr b, mp_size_t n, mp_ptr tp)
+{
+  if ((n&1) != 0) mpn_kara_mul_int_n (p, a, b, n, tp);
+
+  mp_limb_t w, w0, w1, c;
+  mp_size_t n2;
+  mp_srcptr x, y;
+  mp_size_t i;
+  mp_ptr ws, up, vp, tp1, tp2;
+  int sign, ci;
+
+  n2 = n >> 1;
+  ASSERT (n2 > 0);
+
+  
+   /* Even length. */
+      i = n2;
+      do
+	{
+	  --i;
+	  w0 = a[i];
+	  w1 = a[n2 + i];
+	}
+      while (w0 == w1 && i != 0);
+      sign = 0;
+      if (w0 < w1)
+	{
+	  x = a + n2;
+	  y = a;
+	  sign = ~0;
+	}
+      else
+	{
+	  x = a;
+	  y = a + n2;
+	}
+   ws = __GMP_ALLOCATE_FUNC_LIMBS(n + 2*n2 + 2*MPN_KARA_MUL_N_TSIZE(n2));
+   vp = ws + n; 
+	mpn_sub_n (vp, x, y, n2);
+	up = vp + n2;
+	tp1 = up + n2;
+   tp2 = tp1 + MPN_KARA_MUL_N_TSIZE(n2);
+
+      i = n2;
+      do
+	{
+	  --i;
+	  w0 = b[i];
+	  w1 = b[n2 + i];
+	}
+      while (w0 == w1 && i != 0);
+      if (w0 < w1)
+	{
+	  x = b + n2;
+	  y = b;
+	  sign = ~sign;
+	}
+      else
+	{
+	  x = b;
+	  y = b + n2;
+	}
+      mpn_sub_n (up, x, y, n2);
+
+      /* Pointwise products. */
+ 	  
+#pragma omp parallel sections
+		{
+#pragma omp section
+	  mpn_kara_mul_int_n (ws, vp, up, n2, tp1);
+#pragma omp section
+	  mpn_kara_mul_int_n (p, a, b, n2, tp2);
+#pragma omp section
+	  mpn_kara_mul_int_n (p + n, a + n2, b + n2, n2, tp);
+		}	
+      /* Interpolate. */
+          
+      if (sign)
+	{
+	 #if HAVE_NATIVE_mpn_addadd_n
+	 w=mpn_addadd_n(ws,p+n,p,ws,n);
+	 #else 
+	 w = mpn_add_n (ws, p, ws, n);
+         w += mpn_add_n (ws, p + n, ws, n);
+         #endif
+        }
+      else
+	{
+	 #if HAVE_NATIVE_mpn_addsub_n
+	 w=mpn_addsub_n(ws,p+n,p,ws,n);
+	 #else
+	 w = -mpn_sub_n (ws, p, ws, n);
+         w += mpn_add_n (ws, p + n, ws, n);
+         #endif         
+        }
+     
+      w += mpn_add_n (p + n2, p + n2, ws, n);
+      MPN_INCR_U (p + n2 + n, 2 * n - (n2 + n), w);
+	__GMP_FREE_FUNC_LIMBS (ws, n + 2*n2);
 }
 
 void
