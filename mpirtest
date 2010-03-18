@@ -78,6 +78,14 @@ fi
 if [ $SYSNAME = "eno" ] ; then
 	COMP="gcc cc"
 fi
+if [ $SYSNAME = "iras" ] ; then
+	COMP="cc"
+	# gcc is broken
+fi
+if [ $SYSNAME = "cleo" ] ; then
+	COMP="cc"
+	# gcc is broken
+fi
 echo "Using $CPUS cpus"
 
 FATCPU="x86_64\ni486\npentium\npentiummmx\npentiumpro\npentium2\npentium3\ncore\ncore2\npenryn\nnehalem\natom\nnetburst\nnetburtslahf\npentium4\nprescott\nk5\nk6\nk62\nk63\nk7\nk8\nk10\nviac3\nviac32\nnano\nk102"
