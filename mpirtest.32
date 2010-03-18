@@ -54,7 +54,7 @@ if [ $SYSNAME = "mark2" ] ; then
 	TCXXFLAGS=-O1
 fi
 if [ $SYSNAME = "t2" ] ; then
-	CPUS=8
+	CPUS=128
 	COMP="gcc cc"
 	#LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/sparc-solaris-toolchain/lib/sparcv9
         #TLD=/usr/ccs/bin/sparcv9/ld
