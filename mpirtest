@@ -79,12 +79,10 @@ if [ $SYSNAME = "eno" ] ; then
 	COMP="gcc cc"
 fi
 if [ $SYSNAME = "iras" ] ; then
-	COMP="cc icc"
-	# gcc is broken
+	COMP="gcc cc icc"
 fi
 if [ $SYSNAME = "cleo" ] ; then
-	COMP="cc icc"
-	# gcc is broken
+	COMP="gcc cc icc"
 fi
 echo "Using $CPUS cpus"
 
