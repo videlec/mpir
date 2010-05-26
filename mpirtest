@@ -3,6 +3,27 @@
 # run this in the directory where everything will be built
 # first param is mpir directory
 
+if [ $# -eq 1 ] ; then
+	# lauched by user so add in nice
+	nice
+	RET=$?
+	ionice
+	if [ $? -eq 0 -a $RET -eq 0 ] ; then
+		exec nice ionice -c2 -n7 $0 NICED $*
+	else
+		exec $0 NICED $*
+	fi
+fi
+if [ $# -ne 2 ] ; then
+	echo "Usage: $0 mpir_directory"
+	exit 1
+fi
+if [ ! $1 = "NICED" ] ; then
+	echo "ERROR"
+	exit 1
+fi
+shift
+
 SUCCESS=""
 HACK="echo 0"
 HACK2="echo 0"
@@ -56,9 +77,6 @@ fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=128
 	COMP="gcc"
-	# where is cc
-	#LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/sparc-solaris-toolchain/lib/sparcv9
-        #TLD=/usr/ccs/bin/sparcv9/ld   this was for cc ???
 fi
 if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
