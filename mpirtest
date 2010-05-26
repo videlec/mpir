@@ -25,7 +25,7 @@ fi
 shift
 
 ABI=
-if [ $0 = "mpirtest.32" ] ; then
+if [ $0 = "mpirtest32" ] ; then
 	ABI="ABI=32"
 fi
 SUCCESS=""
