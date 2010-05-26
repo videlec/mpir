@@ -24,6 +24,10 @@ if [ ! $1 = "NICED" ] ; then
 fi
 shift
 
+ABI=
+if [ $0 = "mpirtest.32" ] ; then
+	ABI="ABI=32"
+fi
 SUCCESS=""
 HACK="echo 0"
 HACK2="echo 0"
@@ -149,39 +153,39 @@ do
 		# it would be nice if we set this back on exit
 	fi
 	# standard build
-	build $C $CX ""
+	build $C $CX "$ABI"
 	# all features
-	build $C $CX "--enable-cxx --enable-gmpcompat"
+	build $C $CX "$ABI --enable-cxx --enable-gmpcompat"
 	# all features and debug
-	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+	build $C $CX "$ABI --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	# maximum debug
 	export CFLAGS=$TCFLAGS
 	export CXXFLAGS=$TCXXFLAGS
-	build $C $CX "--enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=$SYS"
+	build $C $CX "$ABI --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=$SYS"
 	unset CFLAGS
 	unset CXXFLAGS
 	if [ $FAT -eq 1 ] ; then
 		# standard build
-		build $C $CX "--enable-fat"
+		build $C $CX "$ABI --enable-fat"
 		# all features
-		build $C $CX "--enable-fat --enable-cxx --enable-gmpcompat"
+		build $C $CX "$ABI --enable-fat --enable-cxx --enable-gmpcompat"
 		# all features and debug
-		build $C $CX "--enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+		build $C $CX "$ABI --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	fi
 	if [ $BUILDSHARED -eq 1 ] ; then
 		#standard build
-		build $C $CX "--enable-shared --disable-static"
+		build $C $CX "$ABI --enable-shared --disable-static"
 		# all features
-		build $C $CX "--enable-shared --disable-static --enable-cxx --enable-gmpcompat"
+		build $C $CX "$ABI --enable-shared --disable-static --enable-cxx --enable-gmpcompat"
 		# all features and debug
-		build $C $CX "--enable-shared --disable-static --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+		build $C $CX "$ABI --enable-shared --disable-static --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 		if [ $FAT -eq 1 ] ; then
 			# standard build
-			build $C $CX "--enable-shared --disable-static --enable-fat"
+			build $C $CX "$ABI --enable-shared --disable-static --enable-fat"
 			# all features
-			build $C $CX "--enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat"
+			build $C $CX "$ABI --enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat"
 			# all features and debug
-			build $C $CX "--enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+			build $C $CX "$ABI --enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 		fi
 	fi
 done
