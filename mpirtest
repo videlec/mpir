@@ -185,11 +185,15 @@ do
 		fi
 	fi
 done
+echo 
+echo
 uname -a
 ${DIR}/config.guess
 for C in $COMP
 do
+	echo "Compiler $C is "
 	$C -v
+	echo
 done
 echo -e "${SYSNAME}\n$SUCCESS"
 # try build try 
