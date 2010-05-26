@@ -9,6 +9,7 @@ if [ $# -eq 1 ] ; then
 	RET=$?
 	ionice
 	if [ $? -eq 0 -a $RET -eq 0 ] ; then
+		echo "NICING"
 		exec nice ionice -c2 -n7 $0 NICED $*
 	else
 		exec $0 NICED $*
@@ -26,6 +27,7 @@ shift
 
 ABI=
 if [ $0 = "mpirtest32" ] ; then
+	echo "USING 32 bit ABI"
 	ABI="ABI=32"
 fi
 SUCCESS=""
