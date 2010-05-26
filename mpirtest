@@ -82,12 +82,9 @@ if [ $SYSNAME = "mark2" ] ; then
 fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=128
-	COMP="gcc"
 fi
 if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
-	COMP="gcc"
-	# gcc-3.3 is broken with c++
 fi
 if [ $SYSNAME = "cicero" ] ; then
 	COMP="gcc cc"
@@ -114,7 +111,11 @@ FATCPU="x86_64\ni486\npentium\npentiummmx\npentiumpro\npentium2\npentium3\ncore\
 FAT=0
 SYS=$($DIR/config.guess | cut -f 1 -d -)
 if [ $(echo -e $FATCPU | grep -c ^${SYS}\$) -eq 1 ] ; then FAT=1 ; echo "Using FAT" ; fi
-SYS=none-$($DIR/config.guess | cut -f 2- -d -)
+if [ $ABI = "ABI=32" ] ; then
+	SYS=long-$($DIR/config.guess | cut -f 2- -d -)	
+else
+	SYS=longlong-$($DIR/config.guess | cut -f 2- -d -)
+fi
 
 BUILDSHARED=0
 if [ $($DIR/config.guess | cut -f 3 -d -) = "cygwin" ] ; then
