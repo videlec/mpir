@@ -143,8 +143,8 @@ SUCCESS=$(echo -e "${SUCCESS}\nPASSED CC=$1 CXX=$2 configure=$3")
 
 for C in $COMP
 do
-	#CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/icpc/)
-	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/)
+	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/g++/)
+	#CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/)
 	if [ $(uname) = "SunOS" ] ; then
 		CX=$(echo $CX | sed s/c++/CC/)
 	fi
