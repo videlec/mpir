@@ -114,7 +114,7 @@ if [ $(echo -e $FATCPU | grep -c ^${SYS}\$) -eq 1 ] ; then FAT=1 ; echo "Using F
 if [ $ABI = "ABI=32" ] ; then
 	SYS=long-$($DIR/config.guess | cut -f 2- -d -)	
 else
-	SYS=longlong-$($DIR/config.guess | cut -f 2- -d -)
+	SYS=none-$($DIR/config.guess | cut -f 2- -d -)
 fi
 
 BUILDSHARED=0
