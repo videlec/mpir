@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #    sh not bash for mingw
 # run this in the directory where everything will be built
 # first param is mpir directory
@@ -126,7 +126,7 @@ if [ $($DIR/config.guess | cut -f 3 -d -) = "cygwin" ] ; then
 fi
 
 CONFIG=$DIR/configure
-SHE=/bin/bash
+SHE=`which bash`
 
 if [ $($DIR/config.guess | cut -f 3 -d -) = "mingw32" ] ; then
 	CONFIG=../$RDIR/configure
