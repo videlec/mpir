@@ -80,19 +80,23 @@ if [ $SYSNAME = "mark2" ] ; then
 	TCFLAGS=-O1
 	TCXXFLAGS=-O1
 fi
+if [ $SYSNAME = "sage" ] ; then
+	COMP="gcc gcc-3.4 gcc-4.1"
+fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=128
 fi
 if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
+	COMP="gcc gcc-3.3"
 fi
 if [ $SYSNAME = "cicero" ] ; then
 	COMP="gcc cc"
 fi
 if [ $SYSNAME = "fulvia" ] ; then
 	CPUS=4
-	COMP="gcc"
-	# cc broken at the mo
+	COMP="cc gcc"
+	# cc broken at the mo ?
 	TCFLAGS=-m64
 	TCXXFLAGS=-m64
 fi
@@ -104,6 +108,18 @@ if [ $SYSNAME = "iras" ] ; then
 fi
 if [ $SYSNAME = "cleo" ] ; then
 	COMP="gcc cc icc"
+fi
+if [ $SYSNAME = "sextus" ] ; then
+	COMP="gcc cc"
+fi
+if [ $SYSNAME = "lena" ] ; then
+	COMP="gcc gcc34 cc"
+fi
+if [ $SYSNAME = "flavius" ] ; then
+	COMP="gcc gcc34 cc"
+fi
+if [ $SYSNAME = "taurus" ] ; then
+	COMP="gcc cc"
 fi
 echo "Using $CPUS cpus"
 
