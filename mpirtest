@@ -87,14 +87,14 @@ fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=128
 	if [ ! $ABI = "" ] ; then
-		ABI=long
+		ABI="ABI=long"
 	fi
 fi
 if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
 	COMP="gcc gcc-3.3"
 	if [ ! $ABI = "" ] ; then
-		ABI=long
+		ABI="ABI=long"
 	fi
 fi
 if [ $SYSNAME = "cicero" ] ; then
