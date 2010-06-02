@@ -84,7 +84,8 @@ fi
 if [ $SYSNAME = "sage.math.washington.edu" ] ; then
 	COMP="gcc gcc-3.4"
 	# gcc-4.1 exists but g++-4.1 DNE
-	# appears to 32bit abi
+	# gcc-3.4 works with 32bit abi
+	# gcc works with 32bit ABI but g++ does not
 fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=128
@@ -124,10 +125,12 @@ fi
 if [ $SYSNAME = "lena" ] ; then
 	COMP="gcc cc"
 	# also has gcc34 but g++34 DNE 
-	# appears to have 32bit but only with gcc not cc
+	# cc is NOT 32bit
+	# gcc is 32bit but g++ is not
 fi
 if [ $SYSNAME = "flavius" ] ; then
-	COMP="gcc gcc34 cc"
+	COMP="gcc cc"
+	# gcc34 is ok but g++34 DNE
 fi
 if [ $SYSNAME = "taurus" ] ; then
 	COMP="gcc cc"
