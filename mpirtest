@@ -28,7 +28,8 @@ shift
 ABI=
 if [ $(basename $0) = "mpirtest32" ] ; then
 	echo "USING 32 bit ABI"
-	ABI="ABI=32"
+	ABI="ABI=32"	# for varro and t2 ABI=long is better , although long
+			# is 64bit so ???? must be for backward compat
 fi
 SUCCESS=""
 HACK="echo 0"
@@ -85,10 +86,16 @@ if [ $SYSNAME = "sage" ] ; then
 fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=128
+	if [ ! $ABI = "" ] ; then
+		ABI=long
+	fi
 fi
 if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
 	COMP="gcc gcc-3.3"
+	if [ ! $ABI = "" ] ; then
+		ABI=long
+	fi
 fi
 if [ $SYSNAME = "cicero" ] ; then
 	COMP="gcc cc"
@@ -126,12 +133,12 @@ echo "Using $CPUS cpus"
 FATCPU="x86_64\ni486\npentium\npentiummmx\npentiumpro\npentium2\npentium3\ncore\ncore2\npenryn\nnehalem\natom\nnetburst\nnetburtslahf\npentium4\nprescott\nk5\nk6\nk62\nk63\nk7\nk8\nk10\nviac3\nviac32\nnano\nk102"
 FAT=0
 SYS=$($DIR/config.guess | cut -f 1 -d -)
-if [ $(echo -e $FATCPU | grep -c ^${SYS}\$) -eq 1 ] ; then FAT=1 ; echo "Using FAT" ; fi
-if [ $ABI = "ABI=32" ] ; then
-	SYS=long-$($DIR/config.guess | cut -f 2- -d -)	
-else
+if [ $(echo -e $FATCPU | grep -c ^${SYS}\$) = "1" ] ; then FAT=1 ; echo "Using FAT" ; fi
+#if [ $ABI = "ABI=32" ] ; then
+#	SYS=long-$($DIR/config.guess | cut -f 2- -d -)	
+#else
 	SYS=none-$($DIR/config.guess | cut -f 2- -d -)
-fi
+#fi
 
 BUILDSHARED=0
 if [ $($DIR/config.guess | cut -f 3 -d -) = "cygwin" ] ; then
