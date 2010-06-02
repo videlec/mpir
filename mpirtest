@@ -82,8 +82,9 @@ if [ $SYSNAME = "mark2" ] ; then
 	TCFLAGS=-O1
 	TCXXFLAGS=-O1
 fi
-if [ $SYSNAME = "sage" ] ; then
-	COMP="gcc gcc-3.4 gcc-4.1"
+if [ $SYSNAME = "sage.math.washington.edu" ] ; then
+	COMP="gcc gcc-3.4"
+	# gcc-4.1 exists but g++-4.1 DNE 
 fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=128
@@ -115,7 +116,8 @@ if [ $SYSNAME = "sextus" ] ; then
 	COMP="gcc cc"
 fi
 if [ $SYSNAME = "lena" ] ; then
-	COMP="gcc gcc34 cc"
+	COMP="gcc cc"
+	# also has gcc34 but g++34 DNE 
 fi
 if [ $SYSNAME = "flavius" ] ; then
 	COMP="gcc gcc34 cc"
@@ -217,4 +219,5 @@ do
 	echo
 done
 echo -e "${SYSNAME}\n$SUCCESS"
-# try build try 
+# try build try , tune ,speed etc
+
