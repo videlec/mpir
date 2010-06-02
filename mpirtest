@@ -29,10 +29,9 @@ ABIN=
 ABIC=
 if [ $(basename $0) = "mpirtest32" ] ; then
 	echo "USING 32 bit ABI"
-	ABIN="ABI=32"		# for varro and t2 for a plain C build ONLY we need ABI=long , although long
-	ABIC="ABI=long"		# is 64bit so ???? must be for backward compat
+	ABIN="ABI=32"
+	ABIC="ABI=32"
 fi
-ABI=$ABIN
 SUCCESS=""
 HACK="echo 0"
 HACK2="echo 0"
@@ -84,14 +83,21 @@ if [ $SYSNAME = "mark2" ] ; then
 fi
 if [ $SYSNAME = "sage.math.washington.edu" ] ; then
 	COMP="gcc gcc-3.4"
-	# gcc-4.1 exists but g++-4.1 DNE 
+	# gcc-4.1 exists but g++-4.1 DNE
+	# appears to 32bit abi
 fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=128
+	if [ ! $ABIC = "" ] ; then
+		ABIC="ABI=long"		# for backward compat even though long is 64 bit
+	fi
 fi
 if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
 	COMP="gcc gcc-3.3"
+	if [ ! $ABIC = "" ] ; then
+		ABIC="ABI=long"		# for backward compat even though long is 64 bit
+	fi
 fi
 if [ $SYSNAME = "cicero" ] ; then
 	COMP="gcc cc"
@@ -118,6 +124,7 @@ fi
 if [ $SYSNAME = "lena" ] ; then
 	COMP="gcc cc"
 	# also has gcc34 but g++34 DNE 
+	# appears to have 32bit but only with gcc not cc
 fi
 if [ $SYSNAME = "flavius" ] ; then
 	COMP="gcc gcc34 cc"
@@ -172,11 +179,11 @@ do
 		# it would be nice if we set this back on exit
 	fi
 	# standard build
-	build $C $CX "$ABI"
+	build $C $CX "$ABIN"
 	# all features
-	build $C $CX "$ABI --enable-cxx --enable-gmpcompat"
+	build $C $CX "$ABIN --enable-cxx --enable-gmpcompat"
 	# all features and debug
-	build $C $CX "$ABI --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+	build $C $CX "$ABIN --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	# maximum debug
 	export CFLAGS=$TCFLAGS
 	export CXXFLAGS=$TCXXFLAGS
@@ -185,26 +192,26 @@ do
 	unset CXXFLAGS
 	if [ $FAT -eq 1 ] ; then
 		# standard build
-		build $C $CX "$ABI --enable-fat"
+		build $C $CX "$ABIN --enable-fat"
 		# all features
-		build $C $CX "$ABI --enable-fat --enable-cxx --enable-gmpcompat"
+		build $C $CX "$ABIN --enable-fat --enable-cxx --enable-gmpcompat"
 		# all features and debug
-		build $C $CX "$ABI --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+		build $C $CX "$ABIN --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 	fi
 	if [ $BUILDSHARED -eq 1 ] ; then
 		#standard build
-		build $C $CX "$ABI --enable-shared --disable-static"
+		build $C $CX "$ABIN --enable-shared --disable-static"
 		# all features
-		build $C $CX "$ABI --enable-shared --disable-static --enable-cxx --enable-gmpcompat"
+		build $C $CX "$ABIN --enable-shared --disable-static --enable-cxx --enable-gmpcompat"
 		# all features and debug
-		build $C $CX "$ABI --enable-shared --disable-static --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+		build $C $CX "$ABIN --enable-shared --disable-static --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 		if [ $FAT -eq 1 ] ; then
 			# standard build
-			build $C $CX "$ABI --enable-shared --disable-static --enable-fat"
+			build $C $CX "$ABIN --enable-shared --disable-static --enable-fat"
 			# all features
-			build $C $CX "$ABI --enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat"
+			build $C $CX "$ABIN --enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat"
 			# all features and debug
-			build $C $CX "$ABI --enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
+			build $C $CX "$ABIN --enable-shared --disable-static --enable-fat --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug"
 		fi
 	fi
 done
