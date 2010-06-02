@@ -25,12 +25,14 @@ if [ ! $1 = "NICED" ] ; then
 fi
 shift
 
-ABI=
+ABIN=
+ABIC=
 if [ $(basename $0) = "mpirtest32" ] ; then
 	echo "USING 32 bit ABI"
-	ABI="ABI=32"	# for varro and t2 ABI=long is better , although long
-			# is 64bit so ???? must be for backward compat
+	ABIN="ABI=32"		# for varro and t2 for a plain C build ONLY we need ABI=long , although long
+	ABIC="ABI=long"		# is 64bit so ???? must be for backward compat
 fi
+ABI=$ABIN
 SUCCESS=""
 HACK="echo 0"
 HACK2="echo 0"
@@ -40,13 +42,12 @@ if [ $# -eq 1 ] ; then
 	# get absolute directory
 	REL=$(echo $1 | cut -b 1)
 	if [ $REL = "/" ] ; then
-	       DIR=$1
-	       # if mingw then abort
-	       if [ $($DIR/config.guess | cut -f 3 -d -) = "mingw32" ] ; then
-	       	echo "ERROR mingw doesn't like absolute paths"
-		exit 1
+		DIR=$1
+		# if mingw then abort
+		if [ $($DIR/config.guess | cut -f 3 -d -) = "mingw32" ] ; then
+			echo "ERROR mingw doesn't like absolute paths"
+			exit 1
 		fi
-
 	else
 	       DIR=$(pwd)/$1
 	       RDIR=$1
@@ -86,16 +87,10 @@ if [ $SYSNAME = "sage" ] ; then
 fi
 if [ $SYSNAME = "t2" ] ; then
 	CPUS=128
-	if [ ! $ABI = "" ] ; then
-		ABI="ABI=long"
-	fi
 fi
 if [ $SYSNAME = "varro" ] ; then
 	CPUS=2
 	COMP="gcc gcc-3.3"
-	if [ ! $ABI = "" ] ; then
-		ABI="ABI=long"
-	fi
 fi
 if [ $SYSNAME = "cicero" ] ; then
 	COMP="gcc cc"
@@ -134,11 +129,8 @@ FATCPU="x86_64\ni486\npentium\npentiummmx\npentiumpro\npentium2\npentium3\ncore\
 FAT=0
 SYS=$($DIR/config.guess | cut -f 1 -d -)
 if [ $(echo -e $FATCPU | grep -c ^${SYS}\$) = "1" ] ; then FAT=1 ; echo "Using FAT" ; fi
-#if [ $ABI = "ABI=32" ] ; then
-#	SYS=long-$($DIR/config.guess | cut -f 2- -d -)	
-#else
-	SYS=none-$($DIR/config.guess | cut -f 2- -d -)
-#fi
+
+SYS=none-$($DIR/config.guess | cut -f 2- -d -)
 
 BUILDSHARED=0
 if [ $($DIR/config.guess | cut -f 3 -d -) = "cygwin" ] ; then
@@ -168,7 +160,6 @@ SUCCESS=$(echo -e "${SUCCESS}\nPASSED CC=$1 CXX=$2 configure=$3")
 for C in $COMP
 do
 	CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/ | sed s/ic++/g++/)
-	#CX=$(echo $C | sed s/cc/c++/ | sed s/gc++/g++/)
 	if [ $(uname) = "SunOS" ] ; then
 		CX=$(echo $CX | sed s/c++/CC/)
 	fi
@@ -187,7 +178,7 @@ do
 	# maximum debug
 	export CFLAGS=$TCFLAGS
 	export CXXFLAGS=$TCXXFLAGS
-	build $C $CX "$ABI --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=$SYS"
+	build $C $CX "$ABIC --enable-cxx --enable-gmpcompat --enable-assert --enable-alloca=debug --build=$SYS"
 	unset CFLAGS
 	unset CXXFLAGS
 	if [ $FAT -eq 1 ] ; then
