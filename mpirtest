@@ -54,7 +54,7 @@ if [ $# -eq 1 ] ; then
 fi
 
 # dont want to run yacc
-touch $DIR/demos/calc/*.c $DIR/demos/calc/*.h
+#touch $DIR/demos/calc/*.c $DIR/demos/calc/*.h
 
 SYSNAME=$(uname -n)
 if [ -e $SYSNAME ] ; then echo "ERROR directory $SYSNAME allready exist" ; exit 1 ; fi
